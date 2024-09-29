@@ -58,7 +58,7 @@ $spacing-values: (
 );
 
 // Container width
-$container-width: 1500px;
+$container-width: 1550px;
 
 // Set up breakpoints
 $breakpoints: (
@@ -84,22 +84,6 @@ $font-sizes: (
     'xs': 12px,
     '2xs': 11px,
     '3xs': 10px
-);
-
-// Set up percentage sizes
-$percentage-widths: (
-	//Fifths
-	'pc-20': 20%,
-	'pc-40': 40%,
-	'pc-60': 60%,
-	'pc-80': 80%,
-	//Quarters
-	'pc-25': 25%,
-	'pc-50': 50%,
-	'pc-75': 75%,
-	//Thirds
-	'pc-33': calc(100% / 3),
-	'pc-66': calc((100% / 3) * 2),
 );
 
 // Define alignment maps
