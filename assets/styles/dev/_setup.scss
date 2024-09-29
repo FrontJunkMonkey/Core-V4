@@ -1,0 +1,25 @@
+// List of 20 hue values spread across the color wheel
+$hues: 15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345, 30, 60, 90, 120, 150, 180, 210, 240;
+
+@function pastel-color($hue, $index) {
+  $saturation: 65% + random(20%);
+  $lightness: 80% + random(10%);
+  @return hsl($hue, $saturation, $lightness);
+}
+
+@mixin distinct-pastel-colors($count) {
+  @for $i from 1 through $count {
+    $hue-index: ($i * 7) % $count; // Use prime number 7 to create a non-sequential order
+    &:nth-child(#{$i}) {
+      background-color: pastel-color(nth($hues, $hue-index + 1), $i);
+    }
+  }
+}
+
+.setup {
+	background-color:#fff;
+	> * {
+		@include distinct-pastel-colors(20);
+		outline:1px solid #888;
+	}
+}

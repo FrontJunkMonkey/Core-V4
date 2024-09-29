@@ -1,0 +1,44 @@
+
+<div id="helperBar" style="position:fixed;z-index:2000;bottom:0;left:0;width:100%;text-align:center;background-color:#090;color:#fff;padding:4px;">Loading</div>
+<script>
+	function updateHelperBar() {
+		const helperBar = document.getElementById('helperBar');
+		const width = window.innerWidth;
+
+		if (width >= 1500) {
+			helperBar.textContent = "LD 1500px+";
+			helperBar.style.backgroundColor = "#00008B"; // DarkBlue
+		} else if (width >= 1191) {
+			helperBar.textContent = "MD 1191px+";
+			helperBar.style.backgroundColor = "#006400"; // DarkGreen
+		} else if (width >= 987) {
+			helperBar.textContent = "SD 987px+";
+			helperBar.style.backgroundColor = "#8B0000"; // DarkRed
+		} else if (width >= 818) {
+			helperBar.textContent = "LT 818px+";
+			helperBar.style.backgroundColor = "#B8860B"; // DarkGoldenRod
+		} else if (width >= 678) {
+			helperBar.textContent = "MT 678px+";
+			helperBar.style.backgroundColor = "#8B008B"; // DarkMagenta
+		} else if (width >= 562) {
+			helperBar.textContent = "ST 562px+";
+			helperBar.style.backgroundColor = "#4B0082"; // Indigo
+		} else if (width >= 466) {
+			helperBar.textContent = "LM 466px+";
+			helperBar.style.backgroundColor = "#008B8B"; // DarkCyan
+		} else if (width >= 386) {
+			helperBar.textContent = "MM 386px+";
+			helperBar.style.backgroundColor = "#FF8C00"; // DarkOrange
+		} else if (width >= 320) {
+			helperBar.textContent = "SM 320px+";
+			helperBar.style.backgroundColor = "#556B2F"; // DarkOliveGreen
+		} else {
+			helperBar.textContent = "Below 320px";
+			helperBar.style.backgroundColor = "#8B4513"; // SaddleBrown
+		}
+	}
+
+	window.addEventListener('resize', updateHelperBar);
+	window.addEventListener('load', updateHelperBar);
+</script>
+<style>body{padding-bottom:28px}</style>

@@ -1,0 +1,145 @@
+// core-v4.scss
+
+// Import variables
+@import '_reset';
+@import '_var';
+@import '_layout';
+
+//Remove after development
+@import '_setup';
+
+// Mixins
+
+// Breakpoints
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  }
+}
+
+// Mixin for generating responsive classes
+@mixin generate-responsive-classes($class, $property, $values, $breakpoints) {
+  @each $value, $size in $values {
+    .#{$class}-#{$value} {
+      #{$property}: $size !important;
+    }
+  }
+  
+  @each $breakpoint, $width in $breakpoints {
+    @include respond-to($breakpoint) {
+      @each $value, $size in $values {
+        .#{$class}-#{$breakpoint}-#{$value} {
+          #{$property}: $size !important;
+        }
+      }
+    }
+  }
+}
+
+// Generate font-size classes
+@include generate-responsive-classes(fs, font-size, $font-sizes, $breakpoints);
+
+// Generate text-align classes
+@mixin generate-text-align-classes {
+  @each $align in $alignments {
+    .text-#{$align} { text-align: $align !important; }
+  }
+  
+  @each $breakpoint, $width in $breakpoints {
+    @include respond-to($breakpoint) {
+      @each $align in $alignments {
+        .text-#{$breakpoint}-#{$align} { text-align: $align !important; }
+      }
+    }
+  }
+}
+@include generate-text-align-classes;
+
+// Generate color classes
+@each $name, $color in $colors {
+  .#{$name} { color: $color !important; }
+  .bg-#{$name} { background-color: $color !important; }
+}
+
+// Max lines mixin
+@mixin max-lines($lines) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Generate max-lines classes
+@for $i from 1 through 6 {
+  .max-lines-#{$i} { @include max-lines($i); }
+}
+
+// Auto grid and flex
+.auto-grid { display: grid; grid-template-columns: repeat(auto-fit, 1fr); }
+.auto-flex { display: flex; width: 100%; 
+  > * { flex: 1; }
+}
+.wrap{flex-wrap:wrap}
+
+// Generate items classes
+@mixin generate-items-classes {
+  @for $i from 1 through $grid-columns {
+    .auto-grid.items-#{$i} { grid-template-columns: repeat(#{$i}, 1fr); }
+  }
+  
+  @each $breakpoint, $width in $breakpoints {
+    @include respond-to($breakpoint) {
+      @for $i from 1 through $grid-columns {
+        .auto-grid.items-#{$breakpoint}-#{$i} { grid-template-columns: repeat(#{$i}, 1fr); }
+      }
+    }
+  }
+}
+@include generate-items-classes;
+
+// Alignment mixin
+@mixin align($position) {
+  $align-values: map-get($alignment-map, $position);
+  align-content: nth($align-values, 1);
+  text-align: nth($align-values, 2);
+}
+
+// Generate alignment classes
+@each $key, $value in $alignment-map {
+  .align-#{$key} { @include align($key); }
+  
+  @each $breakpoint, $value in $breakpoints {
+    .align-#{$breakpoint}-#{$key} {
+      @include respond-to($breakpoint) {
+        @include align($key);
+      }
+    }
+  }
+}
+
+// Generate display classes
+@mixin generate-display-classes {
+  $breakpoint-keys: map-keys($breakpoints);
+  
+  @each $breakpoint in $breakpoint-keys {
+    .d-#{$breakpoint}-on { display: none; }
+    
+    @include respond-to($breakpoint) {
+      .d-#{$breakpoint}-on { display: initial; }
+      .d-#{$breakpoint}-off { display: none !important; }
+    }
+  }
+}
+@include generate-display-classes;
+
+// One liners
+.container{width:100%; max-width:$container-width;}
+button, .button{display:inline-block;background-color:$primary;padding:0.6em 1.3em;color:#fff;border:none;border-radius:$border-radius;white-space:nowrap;cursor:pointer;text-decoration:none;}
+.gap{gap:$gap;}
+
+
+
+@import '_custom';

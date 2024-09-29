@@ -1,0 +1,20 @@
+// //Custom Layouts [Example: @include layout('111-234-564-788-999', 'st');]
+@include layout('12-13');
+@include layout('12-13-14-15-66');
+// @include layout('12-33', 'mt');
+// @include layout('12-03', 'sd');
+
+// //Now specify any widths
+// .layout-12-13{
+// 	grid-template-columns: 85px 1fr;
+// }
+// @include respond-to(mt) {
+// 	.layout-mt-12-33{
+// 		grid-template-columns: auto 47%;
+// 	}
+// }
+// @include respond-to(sd) {
+// 	.layout-sd-12-03{
+// 		grid-template-columns: auto max-content;
+// 	}
+// }

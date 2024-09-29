@@ -1,0 +1,73 @@
+// core-layout.scss
+
+// Function to find the maximum number in a layout name
+@function max-element($layout-name) {
+	$max: 0;
+	@for $i from 1 through str-length($layout-name) {
+	  $char: str-slice($layout-name, $i, $i);
+	  @if str-index('0123456789', $char) {
+		$num: to-number($char);
+		@if $num > $max {
+		  $max: $num;
+		}
+	  }
+	}
+	@return $max;
+  }
+  
+  // Function to convert a string to a number
+  @function to-number($string) {
+	$strings: '0' '1' '2' '3' '4' '5' '6' '7' '8' '9';
+	$numbers:  0   1   2   3   4   5   6   7   8   9;
+	$index: index($strings, $string);
+	@return if($index, nth($numbers, $index), 0);
+  }
+  
+  // Main layout mixin with optional breakpoint
+  @mixin layout($name, $breakpoint: null) {
+	$max: max-element($name);
+	$layout: ();
+	$current-row: ();
+	
+	@for $i from 1 through str-length($name) {
+	  $char: str-slice($name, $i, $i);
+	  @if $char == '-' {
+		$layout: append($layout, $current-row);
+		$current-row: ();
+	  } @else if str-index('0123456789', $char) {
+		$current-row: append($current-row, to-number($char));
+	  }
+	}
+	$layout: append($layout, $current-row);
+	
+	@if $breakpoint {
+	  @include respond-to($breakpoint) {
+		@include generate-layout('#{$breakpoint}-#{$name}', $layout, $max);
+	  }
+	} @else {
+	  @include generate-layout($name, $layout, $max);
+	}
+  }
+  
+  // Helper mixin to generate the actual layout
+  @mixin generate-layout($name, $layout, $max) {
+	.layout-#{$name} {
+	  display: grid;
+	  $areas: '';
+	  @each $row in $layout {
+		$row-areas: '';
+		@each $cell in $row {
+		  $row-areas: $row-areas + ' element#{$cell}';
+		}
+		$areas: $areas + '"#{$row-areas}" ';
+	  }
+	  
+	  grid-template-areas: #{$areas};
+	  
+	  @for $i from 1 through $max {
+		& > :nth-child(#{$i}) {
+		  grid-area: element#{$i};
+		}
+	  }
+	}
+  }
