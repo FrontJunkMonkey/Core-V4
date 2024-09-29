@@ -27,12 +27,13 @@ Example usage:
 </div>
 ```
 The layout-123-145 class creates a grid with a two-row spanning first element and four elements in a 2x2 grid beside it, thus:
-
+```html
++---+---+---+<br>
+| 1 | 2 | 3 |<br>
++---+---+---+<br>
+| 1 | 4 | 5 |<br>
 +---+---+---+
-| 1 | 2 | 3 |
-+---+---+---+
-| 1 | 4 | 5 |
-+---+---+---+
+```
 
 ### 2. Responsive Design Tools
 
