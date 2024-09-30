@@ -136,6 +136,49 @@
 }
 @include generate-display-classes;
 
+// Generate standard margins/paddings
+@mixin generate-margin-padding($property, $short) {
+    @each $i, $value in $spacing-values {
+        .#{$short}-#{$i} { #{$property}: $value !important; }
+
+        @each $direction, $abbr in $directions {
+        .#{$short}#{$direction}-#{$i} { #{$property}-#{$abbr}: $value !important; }
+        }
+
+        .#{$short}x-#{$i} {
+        #{$property}-left: $value !important;
+        #{$property}-right: $value !important;
+        }
+        .#{$short}y-#{$i} {
+        #{$property}-top: $value !important;
+        #{$property}-bottom: $value !important;
+        }
+    }
+
+    @each $breakpoint, $width in $breakpoints {
+        @include respond-to($breakpoint) {
+            @each $i, $value in $spacing-values {
+            .#{$short}-#{$breakpoint}-#{$i} { #{$property}: $value !important; }
+
+            @each $direction, $abbr in $directions {
+                .#{$short}#{$direction}-#{$breakpoint}-#{$i} { #{$property}-#{$abbr}: $value !important; }
+            }
+
+            .#{$short}x-#{$breakpoint}-#{$i} {
+                #{$property}-left: $value !important;
+                #{$property}-right: $value !important;
+            }
+            .#{$short}y-#{$breakpoint}-#{$i} {
+                #{$property}-top: $value !important;
+                #{$property}-bottom: $value !important;
+            }
+            }
+        }
+    }
+}
+@include generate-margin-padding(margin, m);
+@include generate-margin-padding(padding, p);
+
 // One liners
 .container{width:100%; max-width:$container-width;}
 button, .button{display:inline-block;background-color:$primary;padding:0.6em 1.3em;color:#fff;border:none;border-radius:$border-radius;white-space:nowrap;cursor:pointer;text-decoration:none;}
