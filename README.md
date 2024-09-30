@@ -1,16 +1,16 @@
 # Core-v4 SCSS Framework (In Development)
 
-An innovative SCSS framework concept, currently in development, designed to revolutionise web layout creation and streamline the overall development process. This framework aims to take the headaches out of layout design and alignment, offering a range of utility classes and mixins for rapid, responsive development.
+An interesting SCSS framework concept, currently in development, designed for web layout creation and streamline the overall development process. This framework aims to take the headaches out of layout design and alignment, offering a range of utility classes and mixins for rapid, responsive development.
 
 ## 🚧 Project Status: Early Development
 
-This project is currently in its early stages. We're exploring new ideas and welcome any contributions or feedback to help shape its direction.
+This project is currently in its early stages. I'm exploring ideas and welcome any contributions or feedback to help shape its direction.
 
 ## Key Features
 
-### 1. Innovative Layout System
+### 1. Layout System
 
-The cornerstone of this framework is its innovative layout system, which includes:
+The cornerstone of this framework is its layout system, which includes:
 
 - **Dynamic Layout Classes**: Create complex layouts with simple, intuitive class names
 - **Breakpoint-Specific Layouts**: Easily adjust layouts for different screen sizes
@@ -46,7 +46,7 @@ The layout-123-145 class creates a grid with a two-row spanning first element an
 Simplify element alignment with our comprehensive alignment classes:
 
 - `.align-*` classes for various alignment options
-- Responsive alignment classes (e.g., `.align-md-centre`)
+- Responsive alignment classes (e.g., `.align-md-mc` for middle centre on Medium Tablets and above)
 
 ### 4. Typography
 
@@ -101,7 +101,7 @@ This framework is designed to be easily customisable. Key areas for customisatio
 
 ## Contributing
 
-As this project is in its early stages, we greatly appreciate any contributions or feedback. If you have ideas on how to improve the framework or want to contribute code, please feel free to open an issue or submit a pull request.
+As this project is in its early stages, I would greatly appreciate any contributions or feedback. If you have ideas on how to improve the framework or want to contribute code, please feel free to open an issue or submit a pull request.
 
 ## License
 
@@ -109,7 +109,7 @@ This project is free and open for anyone to use, modify, or distribute.
 
 Feel free to use it, fork it, and adapt it for your needs.
 
-If you find it helpful, a mention of the original author (Steve Allday) is appreciated but not required.
+If you find it helpful, a mention of the original author is appreciated but not required.
 
 No warranties or conditions are provided. Use at your own discretion.
 
