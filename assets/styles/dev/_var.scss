@@ -57,6 +57,26 @@ $spacing-values: (
   5: 2.5em
 );
 
+// Define property shortcuts
+$properties: (
+  m: margin,
+  p: padding
+);
+
+// Define direction shortcuts
+$directions: (
+  t: top,
+  r: right,
+  b: bottom,
+  l: left
+);
+
+// Composite directions
+$composite-directions: (
+  x: (l, r),
+  y: (t, b)
+);
+
 // Container width
 $container-width: 1550px;
 

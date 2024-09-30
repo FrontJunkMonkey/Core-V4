@@ -1,70 +1,373 @@
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>CoreV4</title>
-	<link rel="preload" href="assets/fonts/open-sans-v34-latin-regular.woff2" as="font" type="font/woff2">
-	<link rel="preload" href="assets/fonts/open-sans-v34-latin-600.woff2" as="font" type="font/woff2">
-	<style>@font-face{font-display:swap;font-family:'Open Sans';font-style:normal;font-weight:400;src:url('assets/fonts/open-sans-v34-latin-regular.woff2') format('woff2'),url('assets/fonts/open-sans-v34-latin-regular.woff') format('woff')}@font-face{font-display:swap;font-family:'Open Sans';font-style:normal;font-weight:600;src:url('assets/fonts/open-sans-v34-latin-600.woff2') format('woff2'),url('assets/fonts/open-sans-v34-latin-600.woff') format('woff')} *{font-family:'Open Sans',sans-serif;}</style>
-	<link rel="stylesheet" href="assets/styles/core.css">
-	<style>div{min-height:100px;}</style>
-</head>
-<body>
-	<h1>Welcome to CoreV4</h1>
-	<div class="auto-grid gap items-1 items-lm-2 items-lt-4 items-sd-6 setup">
-		<div class="align-bc align-mt-tr">
-			element
-		</div>
+	<head>
+		<style>@font-face{font-display:swap;font-family:'Open Sans';font-style:normal;font-weight:400;src:url(/assets/fonts/open-sans-v34-latin-regular.woff2) format('woff2'),url(/assets/fonts/open-sans-v34-latin-regular.woff) format('woff')}*{font-family:'Open Sans',sans-serif}@font-face{font-display:swap;font-family:'Open Sans';font-style:normal;font-weight:600;src:url(/assets/fonts/open-sans-v34-latin-600.woff2) format('woff2'),url(/assets/fonts/open-sans-v34-latin-600.woff) format('woff')}</style>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Core V4</title>
+		<link rel="stylesheet" href="assets/styles/core.css">
+	</head>
+	<body>
+		<h1>Welcome to CoreV4</h1>
 		<div>
-			<h2 class="mb-2">.layout-12-13-14-15-66</h2>
-			<div class="layout-12-13-14-15-66 gap setup">
-				<div>Element 1</div>
-				<div>Element 2</div>
-				<div>Element 3</div>
-				<div>Element 4</div>
-				<div>Element 5</div>
-				<div>Element 6</div>
+			<div class="container">
+				<div class="auto-grid items-6 align-mc setup">
+					<h1>Testing H1 [35px]</h1>
+					<h2>Testing H2 [27px]</h2>
+					<h3>Testing H3 [17px]</h3>
+					<h4>Testing H4 [15px]</h4>
+					<h5>Testing H5 [13px]</h5>
+					<h6>Testing H6 [10px]</h6>
+				</div>
+				<div class="auto-grid items-7 valign-middle">
+					<div class="fs-xxl">Font Size XX-Large [35px]</div>
+					<div class="fs-xl">Font Size X-Large [24px]</div>
+					<div class="fs-lg">Font Size Large [17px]</div>
+					<div>Font Size Standard [15px]</div>
+					<div class="fs-sm">Font Size Small [13px]</div>
+					<div class="fs-xs">Font Size X-Small [12px]</div>
+					<div class="fs-xxs">Font Size XX-Small [10px]</div>
+				</div>
+				<div class="auto-grid items-5">
+					<div class="bg-highlight">
+						<div class="m-5">Margin XL</div>
+					</div>
+					<div class="bg-highlight">
+						<div class="m-4">Margin LG</div>
+					</div>
+					<div class="bg-highlight">
+						<div class="m-3">Margin MD</div>
+					</div>
+					<div class="bg-highlight">
+						<div class="m-2">Margin SM</div>
+					</div>
+					<div class="bg-highlight">
+						<div class="m-1">Margin XS</div>
+					</div>
+				</div>
+				<div class="auto-grid items-5">
+					<div class="bg-highlight p-5">
+						<div>Padding XL</div>
+					</div>
+					<div class="bg-highlight p-4">
+						<div>Padding LG</div>
+					</div>
+					<div class="bg-highlight p-3">
+						<div>Padding MD</div>
+					</div>
+					<div class="bg-highlight p-2">
+						<div>Padding SM</div>
+					</div>
+					<div class="bg-highlight p-1">
+						<div>Padding XS</div>
+					</div>
+				</div>
+				<div class="jumbotron mb-5">
+					<h1>Welcome to Core V4</h1>
+					<div class="fs-lg">
+						<p>Welcome to the UK's top provider of disability aids, mobility aids and&nbsp;daily&nbsp;living&nbsp;aids.</p>
+						<p>We offer a wide range of aids for the elderly, including crutches, wheelchair accessories, bathroom aids, toilet aids, kitchen aids and&nbsp;dressing&nbsp;aids.</p>
+						<p>We supply direct to the public as well as schools, local authorities and&nbsp;the&nbsp;NHS.</p>
+					</div>
+				</div>
+				<ol class="auto-grid items-3 departments-home">
+					<li>
+						<a href="#">
+							<img src="bathroom.png" alt="Bathroom Department" width="240" height="240">
+							<div class="fs-lg bold">Bathroom</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="bathroom.png" alt="Bathroom Department" width="240" height="240">
+							<div class="fs-lg bold">Bathroom</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="bathroom.png" alt="Bathroom Department" width="240" height="240">
+							<div class="fs-lg bold">Bathroom</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="bathroom.png" alt="Bathroom Department" width="240" height="240">
+							<div class="fs-lg bold">Bathroom</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="bathroom.png" alt="Bathroom Department" width="240" height="240">
+							<div class="fs-lg bold">Bathroom</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="bathroom.png" alt="Bathroom Department" width="240" height="240">
+							<div class="fs-lg bold">Bathroom</div>
+						</a>
+					</li>
+				</ol>
+				<ol class="auto-grid items-4 departments">
+					<li>
+						<a href="#">
+							<img src="aluminium-ramps.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+							<div class="fs-lg bold">Wheelchair Ramps</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="aluminium-ramps.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+							<div class="fs-lg bold">Skin Cleansing Foams & Creams</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="aluminium-ramps.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+							<div class="fs-lg bold">Bed Pans, Male and Female Urinal Bottles</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="aluminium-ramps.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+							<div class="fs-lg bold">Wheelchair Ramps</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="aluminium-ramps.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+							<div class="fs-lg bold">Wheelchair Ramps</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="aluminium-ramps.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+							<div class="fs-lg bold">Wheelchair Ramps</div>
+						</a>
+					</li>
+					<li>
+						<a href="#">
+							<img src="aluminium-ramps.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+							<div class="fs-lg bold">Wheelchair Ramps</div>
+						</a>
+					</li>
+				</ol>
+				<ol class="auto-grid items-4 products text-center black-links">
+					<li class="bordered">
+						<a href="suitcase-ramp-2ft.html">
+							<div>
+								<span class="balloon">VAT<br>Relief</span>
+								<img src="ea_2ft_suitcase_ramps_lg.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+								<hr>
+							</div>
+							<div>
+								<h2 class="max-lines-3">Suitcase Ramp 2ft</h2>
+								<div class="max-lines-3 fs-lg">For assistance when entering or exiting the home, we provide the Outdoor Grab Rail 18 inch. It is ideal for elderly or disabled users that find steps difficult. It features a moulded plastic outer section to provide a secure and comfortable hand grip...</div>
+							</div>
+							<div>
+								<div class="fs-xs mt-2">
+									<div class="strikethrough red bold">&nbsp;WAS £89.00&nbsp;</div>
+									<div class="button bg-red">Today's Price</div>
+								</div>
+								<div class="fs-xl bold mt-1 mb-2">
+									£79.00
+									<div class="fs-xs">&nbsp;with VAT Relief</div>
+								</div>
+								<div class="button fs-lg bold mb-3">More Info &amp; Buy</div>
+							</div>
+						</a>
+					</li>
+					<li class="bordered">
+						<a href="suitcase-ramp-2ft.html">
+							<div>
+								<span class="balloon">VAT<br>Relief</span>
+								<img src="ea_2ft_suitcase_ramps_lg.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+								<hr>
+							</div>
+							<div>
+								<h2 class="max-lines-3">Height Adjustable Kitchen Strolley Trolley with Brakes</h2>
+								<div class="max-lines-3 fs-lg">For assistance when entering or exiting the home, we provide the Outdoor Grab Rail 18 inch. It is ideal for elderly or disabled users that find steps difficult. It features a moulded plastic outer section to provide a secure and comfortable hand grip...</div>
+							</div>
+							<div>
+								<div class="fs-xl bold mt-1 mb-2">
+									£79.00
+									<div class="fs-xs">&nbsp;with VAT Relief</div>
+								</div>
+								<div class="button fs-lg bold mb-3">More Info &amp; Buy</div>
+							</div>
+						</a>
+					</li>
+					<li class="bordered">
+						<a href="suitcase-ramp-2ft.html">
+							<div>
+								<span class="balloon">VAT<br>Relief</span>
+								<img src="ea_2ft_suitcase_ramps_lg.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+								<hr>
+							</div>
+							<div>
+								<h2 class="max-lines-3">Suitcase Ramp 2ft</h2>
+								<div class="max-lines-3 fs-lg">A compact wheelchair and mobility scooter ramp to help transition over steps or doorways.</div>
+							</div>
+							<div>
+								<div class="fs-xl bold mt-1 mb-2">
+									£79.00
+									<div class="fs-xs">&nbsp;with VAT Relief</div>
+								</div>
+								<div class="button fs-lg bold mb-3">More Info &amp; Buy</div>
+							</div>
+						</a>
+					</li>
+					<li class="bordered">
+						<a href="suitcase-ramp-2ft.html">
+							<div>
+								<span class="balloon">VAT<br>Relief</span>
+								<img src="ea_2ft_suitcase_ramps_lg.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+								<hr>
+							</div>
+							<div>
+								<h2 class="max-lines-3">Suitcase Ramp 2ft</h2>
+								<div class="max-lines-3 fs-lg">A compact wheelchair and mobility scooter ramp to help transition over steps or doorways.</div>
+							</div>
+							<div>
+								<div class="fs-xl bold mt-1 mb-2">
+									£79.00
+									<div class="fs-xs">&nbsp;with VAT Relief</div>
+								</div>
+								<div class="button fs-lg bold mb-3">More Info &amp; Buy</div>
+							</div>
+						</a>
+					</li>
+					<li class="bordered">
+						<a href="suitcase-ramp-2ft.html">
+							<div>
+								<span class="balloon">VAT<br>Relief</span>
+								<img src="ea_2ft_suitcase_ramps_lg.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+								<hr>
+							</div>
+							<div>
+								<h2 class="max-lines-3">Suitcase Ramp 2ft</h2>
+								<div class="max-lines-3 fs-lg">A compact wheelchair and mobility scooter ramp to help transition over steps or doorways.</div>
+							</div>
+							<div>
+								<div class="fs-xl bold mt-1 mb-2">
+									£79.00
+									<div class="fs-xs">&nbsp;with VAT Relief</div>
+								</div>
+								<div class="button fs-lg bold mb-3">More Info &amp; Buy</div>
+							</div>
+						</a>
+					</li>
+					<li class="bordered">
+						<a href="suitcase-ramp-2ft.html">
+							<div>
+								<span class="balloon">VAT<br>Relief</span>
+								<img src="ea_2ft_suitcase_ramps_lg.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+								<hr>
+							</div>
+							<div>
+								<h2 class="max-lines-3">Suitcase Ramp 2ft</h2>
+								<div class="max-lines-3 fs-lg">A compact wheelchair and mobility scooter ramp to help transition over steps or doorways.</div>
+							</div>
+							<div>
+								<div class="fs-xl bold mt-1 mb-2">
+									£79.00
+									<div class="fs-xs">&nbsp;with VAT Relief</div>
+								</div>
+								<div class="button fs-lg bold mb-3">More Info &amp; Buy</div>
+							</div>
+						</a>
+					</li>
+					<li class="bordered">
+						<a href="suitcase-ramp-2ft.html">
+							<div>
+								<span class="balloon">VAT<br>Relief</span>
+								<img src="ea_2ft_suitcase_ramps_lg.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+								<hr>
+							</div>
+							<div>
+								<h2 class="max-lines-3">Suitcase Ramp 2ft</h2>
+								<div class="max-lines-3 fs-lg">A compact wheelchair and mobility scooter ramp to help transition over steps or doorways.</div>
+							</div>
+							<div>
+								<div class="fs-xs mt-2">
+									<div class="strikethrough red bold">WAS £89.00</div>
+									<div class="button bg-red">Today's Price</div>
+								</div>
+								<div class="fs-xl bold mt-1 mb-2">
+									£79.00
+									<div class="fs-xs">&nbsp;with VAT Relief</div>
+								</div>
+								<div class="button fs-lg bold mb-3">More Info &amp; Buy</div>
+							</div>
+						</a>
+					</li>
+					<li class="bordered">
+						<a href="suitcase-ramp-2ft.html">
+							<div>
+								<span class="balloon">VAT<br>Relief</span>
+								<img src="ea_2ft_suitcase_ramps_lg.jpg" alt="Suitcase Ramp 2ft" width="240" height="240">
+								<hr>
+							</div>
+							<div>
+								<h2 class="max-lines-3">Suitcase Ramp 2ft</h2>
+								<div class="max-lines-3 fs-lg">A compact wheelchair and mobility scooter ramp to help transition over steps or doorways.</div>
+							</div>
+							<div>
+								<div class="fs-xl bold mt-1 mb-2">
+									£79.00
+									<div class="fs-xs">&nbsp;with VAT Relief</div>
+								</div>
+								<div class="button fs-lg bold mb-3">More Info &amp; Buy</div>
+							</div>
+						</a>
+					</li>
+				</ol>
 			</div>
 		</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div class="align-tc">
-			element
-		</div>
-		<div class="align-br"><h1>Elements of fire beneath the whispy shadows</h1></div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-	</div>
+		<div id="helperBar" style="position:fixed;z-index:2000;bottom:0;left:0;width:100%;text-align:center;background-color:#090;color:#fff;padding:4px;">Loading</div>
+		<script>
+			function updateHelperBar() {
+				const helperBar = document.getElementById('helperBar');
+				const width = window.innerWidth;
 
-	<div class="auto-flex gap wrap setup">
-		<div class="align-bc align-mt-tr">
-			element
-		</div>
-		<div class="bg-light-violet fs-3xl">Element</div>
-		<div><button>Button</button></div>
-		<div><a href="#" class="button">a.button</a></div>
-		<div>Element</div>
-		<div class="align-tc">
-			element
-		</div>
-		<div class="align-br"><h1>Element</h1></div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-	</div>
-	<br>
-	<h2 class="mb-2">.layout-12-13</h2>
-	<div class="layout-12-13 gap setup">
-		<div><h1>Elements of fire beneath the whispy shadows</h1></div>
-		<div class="align-br">Element</div>
-		<div>Lorem Ipsum is simply dummy text of the <a href="#">printing and typesetting industry</a>. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</div>
-	</div>
-</body>
+				if (width >= 1500) {
+					helperBar.textContent = "LD 1500px+";
+					helperBar.style.backgroundColor = "#00008B"; // DarkBlue
+				} else if (width >= 1191) {
+					helperBar.textContent = "MD 1191px+";
+					helperBar.style.backgroundColor = "#006400"; // DarkGreen
+				} else if (width >= 987) {
+					helperBar.textContent = "SD 987px+";
+					helperBar.style.backgroundColor = "#8B0000"; // DarkRed
+				} else if (width >= 818) {
+					helperBar.textContent = "LT 818px+";
+					helperBar.style.backgroundColor = "#B8860B"; // DarkGoldenRod
+				} else if (width >= 678) {
+					helperBar.textContent = "MT 678px+";
+					helperBar.style.backgroundColor = "#8B008B"; // DarkMagenta
+				} else if (width >= 562) {
+					helperBar.textContent = "ST 562px+";
+					helperBar.style.backgroundColor = "#4B0082"; // Indigo
+				} else if (width >= 466) {
+					helperBar.textContent = "LM 466px+";
+					helperBar.style.backgroundColor = "#008B8B"; // DarkCyan
+				} else if (width >= 386) {
+					helperBar.textContent = "MM 386px+";
+					helperBar.style.backgroundColor = "#FF8C00"; // DarkOrange
+				} else if (width >= 320) {
+					helperBar.textContent = "SM 320px+";
+					helperBar.style.backgroundColor = "#556B2F"; // DarkOliveGreen
+				} else {
+					helperBar.textContent = "Below 320px";
+					helperBar.style.backgroundColor = "#8B4513"; // SaddleBrown
+				}
+			}
+
+			window.addEventListener('resize', updateHelperBar);
+			window.addEventListener('load', updateHelperBar);
+		</script>
+		<style>body{padding-bottom:28px}</style>
+	</body>
 </html>

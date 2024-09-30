@@ -1,4 +1,4 @@
-// core-v4.scss by S. Allday
+// core-v4.scss
 
 // Import variables
 @import '_reset';
@@ -110,15 +110,16 @@
 // Generate alignment classes
 @each $key, $value in $alignment-map {
   .align-#{$key} { @include align($key); }
-  
-  @each $breakpoint, $value in $breakpoints {
-    .align-#{$breakpoint}-#{$key} {
-      @include respond-to($breakpoint) {
-        @include align($key);
-      }
-    }
-  }
 }
+@each $key, $value in $alignment-map {
+	@each $breakpoint, $value in $breakpoints {
+	  .align-#{$breakpoint}-#{$key} {
+		@include respond-to($breakpoint) {
+		  @include align($key);
+		}
+	  }
+	}
+  }
 
 // Generate display classes
 @mixin generate-display-classes {
