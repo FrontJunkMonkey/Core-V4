@@ -104,6 +104,7 @@
 @mixin align($position) {
   $align-values: map-get($alignment-map, $position);
   align-content: nth($align-values, 1);
+  align-items: nth($align-values, 1);
   text-align: nth($align-values, 2);
 }
 
