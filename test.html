@@ -8,63 +8,23 @@
 	<link rel="preload" href="assets/fonts/open-sans-v34-latin-600.woff2" as="font" type="font/woff2">
 	<style>@font-face{font-display:swap;font-family:'Open Sans';font-style:normal;font-weight:400;src:url('assets/fonts/open-sans-v34-latin-regular.woff2') format('woff2'),url('assets/fonts/open-sans-v34-latin-regular.woff') format('woff')}@font-face{font-display:swap;font-family:'Open Sans';font-style:normal;font-weight:600;src:url('assets/fonts/open-sans-v34-latin-600.woff2') format('woff2'),url('assets/fonts/open-sans-v34-latin-600.woff') format('woff')} *{font-family:'Open Sans',sans-serif;}</style>
 	<link rel="stylesheet" href="assets/styles/core.css">
-	<style>div{min-height:100px;}</style>
+	<style>body > div > div{min-height:1000px;}</style>
 </head>
 <body>
-	<h1>Welcome to CoreV4</h1>
-	<div class="auto-grid gap items-1 items-lm-2 items-lt-4 items-sd-6 setup">
-		<div class="align-bc align-mt-mr">
-			<h2>element</h2>
+	<div class="auto-grid gap items-5 setup">
+		<div class="align-mc">
+			<img src="https://placehold.co/600x400" style="max-width:200px">
+			<h1>Lore Ipsum</h1>
+			<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+			<p>It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. </p>
+			<p> It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
 		</div>
-		<div>
-			<div class="layout-12-13-14-15-66 gap setup">
-				<div>Element 1<br>.layout-12-13-14-15-66</div>
-				<div>Element 2</div>
-				<div>Element 3</div>
-				<div>Element 4</div>
-				<div>Element 5</div>
-				<div>Element 6</div>
-			</div>
-		</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div class="align-tc">
-			element
-		</div>
-		<div class="align-br"><h1>Lorem Ipsum is simply dummy text</h1></div>
-		<div>Element</div>
 		<div>Element</div>
 		<div>Element</div>
 		<div>Element</div>
 		<div>Element</div>
 	</div>
 
-	<div class="auto-flex gap wrap setup">
-		<div class="align-bc align-mt-tr">
-			element
-		</div>
-		<div class="bg-light-violet fs-3xl">Element</div>
-		<div><button>Button</button></div>
-		<div><a href="#" class="button">a.button</a></div>
-		<div>Element</div>
-		<div class="align-tc">
-			element
-		</div>
-		<div class="align-br"><h1>Element</h1></div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-		<div>Element</div>
-	</div>
-	<br>
-	<h2 class="mb-2">.layout-12-13</h2>
-	<div class="layout-12-13 gap setup">
-		<div><h1>Lorem Ipsum is simply dummy text</h1></div>
-		<div class="align-br">Element</div>
-		<div>Lorem Ipsum is simply dummy text of the <a href="#">printing and typesetting industry</a>. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</div>
-	</div>
 	<div id="helperBar" style="position:fixed;z-index:2000;bottom:0;left:0;width:100%;min-height:unset;text-align:center;background-color:#090;color:#fff;padding:4px;">Loading</div>
 	<script>
 		function updateHelperBar() {

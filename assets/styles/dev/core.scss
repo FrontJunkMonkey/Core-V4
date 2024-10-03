@@ -110,7 +110,8 @@
 
 // Generate alignment classes
 @each $key, $value in $alignment-map {
-  .align-#{$key} { @include align($key); }
+	.align-#{$key} { @include align($key); }
+	.align-#{$key} > * { text-align:initial }
 }
 @each $key, $value in $alignment-map {
 	@each $breakpoint, $value in $breakpoints {
@@ -119,6 +120,7 @@
 		  @include align($key);
 		}
 	  }
+	  .align-#{$breakpoint}-#{$key} > * { text-align:initial }
 	}
   }
 
