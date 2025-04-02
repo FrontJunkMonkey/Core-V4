@@ -25,19 +25,6 @@ p{
 	margin-bottom:1.1em;
 }
 
-ol,ul{
-	display:inline-block;
-	li{
-		text-align:left;
-	}
-}
-
-/* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
-ul[role='list'],
-ol[role='list'] {
-  list-style: none;
-}
-
 /* Set core body defaults */
 body {
   min-height: 100vh;
@@ -56,16 +43,11 @@ h3, h4 {
   text-wrap: balance;
 }
 
-/* A elements that don't have a class get default styles */
-a:not([class]) {
-  text-decoration-skip-ink: auto;
-  color: currentColor;
-}
-
 /* Make images easier to work with */
 img,
 picture {
-  max-width: 100%;
+  width: 100%;
+  height:auto;
   display: inline-block;
   vertical-align: middle;
 }

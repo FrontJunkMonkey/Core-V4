@@ -1,11 +1,37 @@
 // core-layout.scss
+.layout {
+	display: flex;
+	width: 100%;
+}
+
+.layout > * {
+	flex: auto;
+	> a{
+		display:block;
+		height:100%;
+		min-height:40px;
+		color:$black;
+	}
+}
+
+.equal{
+	grid-auto-columns: 1fr; /* Makes all columns equal width */
+  	grid-auto-rows: 1fr;    /* Makes all rows equal height */
+	  > * {
+		width: 100%;
+		height: 100%;
+		min-width: 0;  /* Prevents overflow */
+		min-height: 0; /* Prevents overflow */
+		overflow: auto; /* Handles overflow content */
+	  }
+}
 
 // Function to find the maximum number in a layout name
 @function max-element($layout-name) {
 	$max: 0;
 	@for $i from 1 through str-length($layout-name) {
 	  $char: str-slice($layout-name, $i, $i);
-	  @if str-index('0123456789', $char) {
+	  @if str-index('0123456789abcdef', $char) {
 		$num: to-number($char);
 		@if $num > $max {
 		  $max: $num;
@@ -17,8 +43,8 @@
   
   // Function to convert a string to a number
   @function to-number($string) {
-	$strings: '0' '1' '2' '3' '4' '5' '6' '7' '8' '9';
-	$numbers:  0   1   2   3   4   5   6   7   8   9;
+	$strings: '0' '1' '2' '3' '4' '5' '6' '7' '8' '9' 'a' 'b' 'c' 'd' 'e' 'f';
+	$numbers:  0   1   2   3   4   5   6   7   8   9   10   11   12   13   14   15;
 	$index: index($strings, $string);
 	@return if($index, nth($numbers, $index), 0);
   }
@@ -34,7 +60,7 @@
 	  @if $char == '-' {
 		$layout: append($layout, $current-row);
 		$current-row: ();
-	  } @else if str-index('0123456789', $char) {
+	  } @else if str-index('0123456789abcdef', $char) {
 		$current-row: append($current-row, to-number($char));
 	  }
 	}

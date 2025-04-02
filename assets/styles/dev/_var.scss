@@ -1,6 +1,8 @@
 // core-var.scss
 
 // Set up variables
+$font: "Open Sans", sans-serif;
+$line-height: 1.8em;
 
 // Primary Colors
 $primary: #008001;
@@ -13,7 +15,7 @@ $black: #0e0e0e;
 $white: #fff;
 
 // Grey Scale Endpoints
-$grey-lightest: #fefefe;
+$grey-lightest: #f4f3f3;
 $grey-darkest: #333;
 
 // Transparent Variations
@@ -47,34 +49,35 @@ $colors: (
 
 // Variables
 $grid-columns: 10;
-$directions: (t: top, b: bottom, l: left, r: right);
+$x-directions: (l: left, r: right);
+$y-directions: (t: top, b: bottom);
 $spacing-values: (
   0: 0,
-  1: 0.5em,
-  2: 1em,
-  3: 1.5em,
-  4: 2em,
-  5: 2.5em
+    half: 0.3em,
+    1: 0.6em,
+    2: 1.2em,
+    3: 1.8em,
+    4: 2.4em,
+    5: 3em,
+    6: 4.5em,
+    7: 6em,
+	8: 7.5em
+);
+
+//Define multipliers
+$multipliers: (
+  xs: 0.375,
+  sm: 0.75,
+  lg: 1.5,
+  xl: 3,
+  2xl: 4.5,
+  3xl: 6
 );
 
 // Define property shortcuts
 $properties: (
   m: margin,
   p: padding
-);
-
-// Define direction shortcuts
-$directions: (
-  t: top,
-  r: right,
-  b: bottom,
-  l: left
-);
-
-// Composite directions
-$composite-directions: (
-  x: (l, r),
-  y: (t, b)
 );
 
 // Container width
@@ -93,11 +96,25 @@ $breakpoints: (
     'ld': 1500px	// Large desktop
 );
 
+:root {
+    @each $name, $value in $breakpoints {
+        --breakpoint-#{$name}: #{$value};
+    }
+}
+
 // Set up font sizes
+$font-size: 16px;
 $font-sizes: (
+	'10xl': 105px,
+    '9xl': 90px,
+    '8xl': 77px,
+    '7xl': 66px,
+    '6xl': 56px,
+    '5xl': 48px,
+    '4xl': 41px,
     '3xl': 35px,
     '2xl': 26px,
-    'xl': 24px,
+    'xl': 22px,
     'lg': 18px,
     'md': 16px,
     'sm': 14px,
@@ -124,5 +141,7 @@ $alignments: (left, center, right);
 
 $border-radius: 0.35em;
 $small-radius: 4px;
+$large-radius: 0.7em;
 $transition: 0.15s;
-$gap: calc(1em + 1vw);
+$gap: calc(0.7em + 0.3vw);
+$box-shadow: 20px 20px 30px rgba(0,0,0,0.3);

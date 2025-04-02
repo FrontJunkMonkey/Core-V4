@@ -8,6 +8,13 @@
 //Remove after development
 @import '_setup';
 
+//Global
+*{
+	font-family: $font;
+	font-size: $font-size;
+	line-height: $line-height;
+}
+
 // Mixins
 
 // Breakpoints
@@ -41,21 +48,6 @@
 // Generate font-size classes
 @include generate-responsive-classes(fs, font-size, $font-sizes, $breakpoints);
 
-// Generate text-align classes
-@mixin generate-text-align-classes {
-  @each $align in $alignments {
-    .text-#{$align} { text-align: $align !important; }
-  }
-  
-  @each $breakpoint, $width in $breakpoints {
-    @include respond-to($breakpoint) {
-      @each $align in $alignments {
-        .text-#{$breakpoint}-#{$align} { text-align: $align !important; }
-      }
-    }
-  }
-}
-@include generate-text-align-classes;
 
 // Generate color classes
 @each $name, $color in $colors {
@@ -73,32 +65,33 @@
 }
 
 // Generate max-lines classes
-@for $i from 1 through 6 {
+@for $i from 1 through 15 {
   .max-lines-#{$i} { @include max-lines($i); }
 }
 
-// Auto grid and flex
-.auto-grid { display: grid; grid-template-columns: repeat(auto-fit, 1fr); }
-.auto-flex { display: flex; width: 100%; 
-  > * { flex: 1; }
-}
-.wrap{flex-wrap:wrap}
-
-// Generate items classes
-@mixin generate-items-classes {
-  @for $i from 1 through $grid-columns {
-    .auto-grid.items-#{$i} { grid-template-columns: repeat(#{$i}, 1fr); }
+// Generate layout gaps
+@mixin generate-gap-classes($gap, $multipliers, $breakpoints) {
+	// Generate base gap classes
+	.gap { gap: $gap; }
+  
+	@each $size, $multiplier in $multipliers {
+	  .gap-#{$size} { gap: calc(#{$gap} * #{$multiplier}); }
   }
   
+	// Generate responsive gap classes
   @each $breakpoint, $width in $breakpoints {
     @include respond-to($breakpoint) {
-      @for $i from 1 through $grid-columns {
-        .auto-grid.items-#{$breakpoint}-#{$i} { grid-template-columns: repeat(#{$i}, 1fr); }
+		.gap-#{$breakpoint} { gap: $gap; }
+  
+		@each $size, $multiplier in $multipliers {
+		  .gap-#{$breakpoint}-#{$size} { gap: calc(#{$gap} * #{$multiplier}); }
       }
     }
   }
 }
-@include generate-items-classes;
+
+// Include the mixin
+@include generate-gap-classes($gap, $multipliers, $breakpoints);
 
 // Alignment mixin
 @mixin align($position) {
@@ -110,30 +103,32 @@
 
 // Generate alignment classes
 @each $key, $value in $alignment-map {
-	.align-#{$key} { @include align($key); }
-	.align-#{$key} > * { text-align:initial }
+	.align-#{$key}, .align-sib-#{$key} > *{ @include align($key); }
 }
-@each $key, $value in $alignment-map {
-	@each $breakpoint, $value in $breakpoints {
-	  .align-#{$breakpoint}-#{$key} {
+@each $breakpoint, $value in $breakpoints {
+	@each $key, $value in $alignment-map {
+		.align-#{$breakpoint}-#{$key}, .align-sib-#{$breakpoint}-#{$key} > * {
 		@include respond-to($breakpoint) {
 		  @include align($key);
 		}
 	  }
-	  .align-#{$breakpoint}-#{$key} > * { text-align:initial }
 	}
   }
 
 // Generate display classes
+.d-off { display: none !important; }
+.d-block { display: block !important; }
+
 @mixin generate-display-classes {
   $breakpoint-keys: map-keys($breakpoints);
   
   @each $breakpoint in $breakpoint-keys {
-    .d-#{$breakpoint}-on { display: none; }
     
     @include respond-to($breakpoint) {
-      .d-#{$breakpoint}-on { display: initial; }
+      .d-#{$breakpoint}-on { display: initial !important; }
       .d-#{$breakpoint}-off { display: none !important; }
+      .d-#{$breakpoint}-unset { display: inherit !important; }
+      .d-#{$breakpoint}-block { display: block !important; }
     }
   }
 }
@@ -143,18 +138,11 @@
 @mixin generate-margin-padding($property, $short) {
     @each $i, $value in $spacing-values {
         .#{$short}-#{$i} { #{$property}: $value !important; }
-
-        @each $direction, $abbr in $directions {
-        .#{$short}#{$direction}-#{$i} { #{$property}-#{$abbr}: $value !important; }
+		@each $dir-short, $dir-long in $x-directions {
+			.#{$short}#{$dir-short}-#{$i}, .#{$short}x-#{$i} {#{$property}-#{$dir-long}: $value !important;}
         }
-
-        .#{$short}x-#{$i} {
-        #{$property}-left: $value !important;
-        #{$property}-right: $value !important;
-        }
-        .#{$short}y-#{$i} {
-        #{$property}-top: $value !important;
-        #{$property}-bottom: $value !important;
+		@each $dir-short, $dir-long in $y-directions {
+			.#{$short}#{$dir-short}-#{$i}, .#{$short}y-#{$i} {#{$property}-#{$dir-long}: $value !important;}
         }
     }
 
@@ -163,17 +151,11 @@
             @each $i, $value in $spacing-values {
             .#{$short}-#{$breakpoint}-#{$i} { #{$property}: $value !important; }
 
-            @each $direction, $abbr in $directions {
-                .#{$short}#{$direction}-#{$breakpoint}-#{$i} { #{$property}-#{$abbr}: $value !important; }
+				@each $dir-short, $dir-long in $x-directions {
+					.#{$short}#{$dir-short}-#{$breakpoint}-#{$i}, .#{$short}x-#{$breakpoint}-#{$i} {#{$property}-#{$dir-long}: $value !important;}
             }
-
-            .#{$short}x-#{$breakpoint}-#{$i} {
-                #{$property}-left: $value !important;
-                #{$property}-right: $value !important;
-            }
-            .#{$short}y-#{$breakpoint}-#{$i} {
-                #{$property}-top: $value !important;
-                #{$property}-bottom: $value !important;
+				@each $dir-short, $dir-long in $y-directions {
+					.#{$short}#{$dir-short}-#{$breakpoint}-#{$i}, .#{$short}y-#{$breakpoint}-#{$i} {#{$property}-#{$dir-long}: $value !important;}
             }
             }
         }
@@ -182,11 +164,147 @@
 @include generate-margin-padding(margin, m);
 @include generate-margin-padding(padding, p);
 
+// Create a slider when the class is added (works in conjuction with Javascript)
+.slider {
+	overflow: hidden;
+	position: relative;
+	@include respond-to(sd) {
+		&.slider-sd-off{
+			overflow: unset;
+		}
+	}
+  
+	.slide-container {
+		display: flex;
+		transition: transform 0.5s ease-in-out;
+		min-width: 100%;
+		margin: 0 !important;
+		padding: 0 !important;
+
+		> * { // Generic selector for all direct children
+			flex: 0 0 100%; // Each slide takes up 100% of the .slider's width
+			display: block; // Ensure block-level layout for all children
+			text-align: center; // Optional: Adjust text alignment for better visuals
+		}
+	}
+	.dots {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 10px; // Space between dots
+		height: 20px; // Ensures consistent height
+	  
+		.dot {
+			width: 12px;
+			height: 12px;
+			background-color: #ccc; // Default dot color
+			border-radius: 50%; // Makes it circular
+			transition: background-color 0.3s ease; // Smooth transition for hover/active states
+			cursor: pointer; // Indicate interactivity
+		
+			&.active {
+			background-color: $primary; // Active dot color
+			}
+		}
+	}
+	
+	.progress-bar {
+		position: relative;
+		height: 8px; // Height of the track
+		width: fit-content; // Adjust to fit the content
+		margin: 7px auto 5px; // Center the track below the slider
+		background-color: transparent; // Optional: Can set a subtle background if desired
+	  
+		.track {
+			position: relative;
+			height: 6px; // Thickness of the track
+			background-color: #ccc; // Track color
+			width: calc(30px * var(--total-slides)); // Width proportional to slide count
+			margin: 0 auto; // Center the track horizontally
+			border-radius: 2px; // Optional: Makes it circular
+		}
+	  
+		.indicator {
+			position: absolute;
+			top: -1px; // Centers the indicator above the track
+			left: 0;
+			height: 8px; // Same as track unit width
+			width: 30px; // Matches track unit width
+			background-color: $primary; // Indicator color
+			border-radius: 3px; // Optional: Makes it circular
+			transition: transform 0.5s ease-in-out; // Smooth sliding animation
+		}
+	}
+			  
+}
+
+.hover-border{
+	outline: 0px solid transparent;
+	&:hover, &:focus{
+		outline: calc(0.3em + 0.3vw) solid $primary;
+	}
+}
+
+input, select, button, .button{
+	display:inline-block;
+	padding:0.6em 1.2em;
+	border:none;
+	border-radius:$border-radius;
+	white-space:nowrap;
+	cursor:pointer;
+	text-decoration:none;
+	margin-bottom:5px;
+	max-width:20em;
+}
+label{
+	display:inline-block;
+	padding:0.6em 0;
+	font-weight:bold;
+}
+
+a{
+	text-decoration:none;
+	color:$black;
+	&.black-links{
+		color:$black;
+	}
+}
+.black-links a{
+	color:$black;
+}
+.readMore{
+	a{
+		color:$secondary;
+		text-decoration:underline;
+	}
+}
+
 // One liners
 .container{width:100%; max-width:$container-width;}
-button, .button{display:inline-block;background-color:$primary;padding:0.6em 1.3em;color:#fff;border:none;border-radius:$border-radius;white-space:nowrap;cursor:pointer;text-decoration:none;}
-.gap{gap:$gap;}
+.container-sm{width:100%; max-width:calc($container-width * 0.9);}
+.container-lg{width:100%; max-width:calc($container-width * 1.15);}
+.container, .container-sm, .container-lg, .m-auto{margin:0 auto;}
+.col-gap{column-gap:$gap;}
+.row-gap{row-gap:$gap;}
+.text-left{text-align:left!important}
+.text-center{text-align:center!important}
+.text-right{text-align:right!important}
+.pos-relative{position:relative}
+.pos-absolute{position:absolute}
+.pos-fixed{position:fixed}
+.full-width{width:100%}
+.bradius{border-radius:$border-radius;}
+.bradius-sm{border-radius:$small-radius;}
+.bradius-lg{border-radius:$large-radius;}
+.bradius-xl{border-radius:40px;}
+.overflow-hidden{overflow:hidden;}
+button, .button{background-color:$primary;color:#fff;}
+.float-left{float:left;}
+.float-right{float:right;}
+.box-shadow{box-shadow:$box-shadow;}
 
+.list-style-none{padding:0; list-style:none;}
+.list-style-inline > li{display:inline-block;height: 100%;}
 
-
+@import '_layouts';
 @import '_custom';

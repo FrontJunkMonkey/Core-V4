@@ -1,0 +1,239 @@
+/* Zoom prompt */
+.zoomee-prompt {
+	position: absolute;
+	bottom: 15px;
+	left: 0;
+	right: 0;
+	width: max-content;
+	margin: 0 auto;
+	padding: 8px 16px;
+	background-color: rgba(0, 0, 0, 0.5);
+	color: white;
+	font-size: 14px;
+	border-radius: 20px;
+	opacity: 0.8;
+	transition: opacity 0.3s;
+	pointer-events: none; /* Allow clicks to pass through */
+	z-index: 3;
+  }
+  
+  .zoomee-slider:hover .zoomee-prompt {
+	opacity: 1;
+  }/* 
+   * Zoomee - Minimal CSS
+   * Only essential styles to make the gallery functional
+   */
+  
+  /* Main container */
+  .zoomee {
+	position: relative;
+	width: 100%;
+  }
+  
+  /* Main slider */
+  .zoomee-slider {
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+	cursor: zoom-in;
+  }
+  
+  /* Track for slides */
+  .zoomee-track {
+	display: flex;
+	transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	will-change: transform;
+  }
+  
+  /* Individual slides */
+  .zoomee-slide {
+	flex: 0 0 100%;
+	width: 100%;
+  }
+  
+  .zoomee-slide img {
+	width: 100%;
+	height: auto;
+	display: block;
+  }
+  
+  /* Thumbnails container */
+  .zoomee-thumbs {
+	position: relative;
+	margin-top: 10px;
+	width: 100%;
+	overflow: hidden;
+  }
+  
+  /* Thumbnails track */
+  .zoomee-thumbs-track {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 10px;
+	overflow-x: auto;
+	padding: 5px 0;
+	scrollbar-width: none; /* Firefox */
+	transition: 0.2s ease;
+  }
+  
+  /* Hide scrollbar */
+  .zoomee-thumbs-track::-webkit-scrollbar {
+	display: none;
+  }
+  
+  /* Thumbnail position */
+  .zoomee-thumbs-track.center {
+	justify-content: center;
+  }
+  
+  .zoomee-thumbs-track.left {
+	justify-content: flex-start;
+  }
+  
+  .zoomee-thumbs-track.right {
+	justify-content: flex-end;
+  }
+  
+  /* Individual thumbnails */
+  .zoomee-thumb {
+	flex: 0 0 auto;
+	width: 80px;
+	height: 80px;
+	border: 4px solid transparent;
+	padding: 0;
+	background: none;
+	opacity: 0.7;
+	transition: opacity 0.3s, border-color 0.3s;
+	cursor: pointer;
+	overflow: hidden;
+  }
+  
+  .zoomee-thumb.active {
+	border-color: #ff40a0;
+	opacity: 1;
+  }
+  
+  .zoomee-thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+  }
+  
+  /* Main navigation buttons */
+  .zoomee-nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 40px;
+	height: 40px;
+	background: rgba(255, 255, 255, 0.7);
+	border-radius: 20px;
+	border: none;
+	font-size: 30px;
+	line-height: 18px;
+	cursor: pointer;
+	z-index: 5;
+	padding: 2px 0 0 2px;
+	margin: 0;
+	color: rgba(0,0,0,0.7);
+  }
+  
+  .zoomee-prev {
+	left: 10px;
+	padding: 2px 2px 0 0;
+  }
+  
+  .zoomee-next {
+	right: 10px;
+  }
+  
+  /* Thumbnail navigation */
+  .zoomee-thumb-nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 30px;
+	height: 30px;
+	background: rgba(255, 255, 255, 0.7);
+	border-radius: 50%;
+	border: none;
+	font-size: 18px;
+	line-height: 1;
+	cursor: pointer;
+	z-index: 5;
+  }
+  
+  .zoomee-thumb-prev {
+	left: 0;
+  }
+  
+  .zoomee-thumb-next {
+	right: 0;
+  }
+  
+  /* Hide buttons when not needed */
+  .hidden {
+	display: none;
+  }
+  
+  /* Zoom overlay */
+  .zoomee-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.9);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s, visibility 0.3s;
+  }
+  
+  .zoomee-overlay.active {
+	opacity: 1;
+	visibility: visible;
+  }
+  
+  .zoomee-overlay-img {
+	max-width: 90%;
+	max-height: 90%;
+  }
+  
+  .zoomee-overlay-close {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	width: 40px;
+	height: 40px;
+	background: rgba(255, 255, 255, 0.2);
+	border: none;
+	border-radius: 50%;
+	color: white;
+	font-size: 30px;
+	line-height: 19px;
+	cursor: pointer;
+	padding: 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+	.zoomee-slider {
+	  cursor: default;
+	}
+	
+	.zoomee-thumb {
+	  width: 60px;
+	  height: 60px;
+	}
+  }
+  
+  @media (max-width: 480px) {
+	.zoomee-thumb {
+	  width: 50px;
+	  height: 50px;
+	}
+  }
