@@ -116,8 +116,8 @@
   }
 
 // Generate display classes
-.d-off { display: none !important; }
-.d-block { display: block !important; }
+.hidden { display: none !important; }
+.block { display: block !important; }
 
 @mixin generate-display-classes {
   $breakpoint-keys: map-keys($breakpoints);
@@ -125,10 +125,10 @@
   @each $breakpoint in $breakpoint-keys {
     
     @include respond-to($breakpoint) {
-      .d-#{$breakpoint}-on { display: initial !important; }
-      .d-#{$breakpoint}-off { display: none !important; }
-      .d-#{$breakpoint}-unset { display: inherit !important; }
-      .d-#{$breakpoint}-block { display: block !important; }
+      .show-#{$breakpoint} { display: initial !important; }
+      .hide-#{$breakpoint} { display: none !important; }
+      .unset-#{$breakpoint} { display: inherit !important; }
+      .block-#{$breakpoint} { display: block !important; }
     }
   }
 }
@@ -286,17 +286,17 @@ a{
 .container, .container-sm, .container-lg, .m-auto{margin:0 auto;}
 .col-gap{column-gap:$gap;}
 .row-gap{row-gap:$gap;}
-.text-left{text-align:left!important}
-.text-center{text-align:center!important}
-.text-right{text-align:right!important}
-.pos-relative{position:relative}
-.pos-absolute{position:absolute}
-.pos-fixed{position:fixed}
+.left{text-align:left!important}
+.center{text-align:center!important}
+.right{text-align:right!important}
+.relative{position:relative}
+.absolute{position:absolute}
+.fixed{position:fixed}
 .full-width{width:100%}
-.bradius{border-radius:$border-radius;}
-.bradius-sm{border-radius:$small-radius;}
-.bradius-lg{border-radius:$large-radius;}
-.bradius-xl{border-radius:40px;}
+.radius{border-radius:$border-radius;}
+.radius-sm{border-radius:$small-radius;}
+.radius-lg{border-radius:$large-radius;}
+.radius-xl{border-radius:40px;}
 .overflow-hidden{overflow:hidden;}
 button, .button{background-color:$primary;color:#fff;}
 .float-left{float:left;}

@@ -1,0 +1,103 @@
+{
+  "name": "core4-extension",
+  "displayName": "Core4 CSS Generator",
+  "description": "Generate optimized CSS from Core4 classes in your HTML",
+  "version": "0.1.0",
+  "publisher": "steveallday",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/core4/extension"
+  },
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "core4.generateCSS",
+        "title": "Generate Core4 CSS"
+      },
+      {
+        "command": "core4.toggleWatching",
+        "title": "Toggle Core4 Watching"
+      }
+    ],
+    "configuration": {
+      "title": "Core4 Extension",
+      "properties": {
+        "core4.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Core4 CSS generation for this project"
+        },
+        "core4.outputPath": {
+          "type": "string",
+          "default": "./styles/core4.css",
+          "description": "Path where generated CSS will be saved"
+        },
+        "core4.minify": {
+          "type": "boolean",
+          "default": true,
+          "description": "Minify the generated CSS"
+        },
+        "core4.includeDefaultStyles": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include default element styles (buttons, inputs, etc.) - disable for existing websites"
+        },
+        "core4.primaryColor": {
+          "type": "string",
+          "default": "#008001",
+          "description": "Primary brand color (used for buttons, links, etc.)"
+        },
+        "core4.secondaryColor": {
+          "type": "string",
+          "default": "#005500",
+          "description": "Secondary brand color (used for hover states, etc.)"
+        },
+        "core4.highlightColor": {
+          "type": "string",
+          "default": "#ff6b35",
+          "description": "Highlight/accent color"
+        },
+        "core4.fontFamily": {
+          "type": "string",
+          "default": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif",
+          "description": "Default font family for the project"
+        },
+        "core4.baseFontSize": {
+          "type": "string",
+          "default": "16px",
+          "description": "Base font size for the project"
+        },
+        "core4.borderRadius": {
+          "type": "string",
+          "default": "0.35em",
+          "description": "Default border radius"
+        },
+        "core4.shadowColor": {
+          "type": "string",
+          "default": "rgba(0,0,0,0.1)",
+          "description": "Default shadow color"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "typescript": "^4.9.5"
+  }
+}

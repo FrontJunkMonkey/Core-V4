@@ -1,116 +1,219 @@
-# Core-v4 SCSS Framework (In Development)
+# Core4 Framework
 
-An interesting SCSS framework concept, currently in development, designed for web layout creation and streamline the overall development process. This framework aims to take the headaches out of layout design and alignment, offering a range of utility classes and mixins for rapid, responsive development.
+A lightweight, intuitive CSS framework designed for modern web development with a focus on developer experience and natural naming conventions.
 
-## 🚧 Project Status: Early Development
+## Philosophy
 
-This project is currently in its early stages. I'm exploring ideas and welcome any contributions or feedback to help shape its direction.
+Core4 follows a simple principle: **"Use the most natural, universal term that a developer would actually type."**
 
-## Key Features
+- No Bootstrap-specific terminology
+- Intuitive abbreviations only when unambiguous
+- Universal terms that work across cultures and languages
+- Minimal learning curve
 
-### 1. Layout System
+## Naming Convention
 
-The cornerstone of this framework is its layout system, which includes:
+### Rule 1: Abbreviate When Unambiguous
+Only abbreviate when the letter(s) could ONLY mean one thing:
 
-- **Dynamic Layout Classes**: Create complex layouts with simple, intuitive class names
-- **Breakpoint-Specific Layouts**: Easily adjust layouts for different screen sizes
-- **Automatic Element Placement**: Elements are positioned based on the layout class, reducing the need for manual positioning
+✅ **Good Abbreviations:**
+- `m-` (margin) - what else could 'm' mean in CSS?
+- `p-` (padding) - what else could 'p' mean in CSS?
+- `fs-` (font-size) - what else could 'fs' mean in CSS?
+- `mxw`, `mxh`, `mnw`, `mnh` (max/min width/height) - completely unambiguous
 
-Example usage:
+❌ **Bad Abbreviations:**
+- `p-relative` - 'p' could mean padding, position, primary, etc.
+- `r-` (radius) - 'r' could mean radius, right, red, etc.
+
+### Rule 2: Use Full Words When Ambiguous
+When the abbreviation could mean multiple things, use the full word:
+
+✅ **Good Full Words:**
+- `radius` (not `r-` or `bradius`)
+- `relative`, `absolute`, `fixed` (not `pos-relative`)
+- `left`, `center`, `right` (not `text-left`)
+- `hidden`, `block` (not `d-off`, `d-block`)
+
+### Rule 3: Contextual Abbreviation
+When the context makes it unambiguous, you can abbreviate more aggressively:
+
+- `absolute`, `relative`, `fixed` - These words ONLY exist in the context of `position`
+- `mxw`, `mxh`, `mnw`, `mnh` - These are completely unambiguous
+
+## Core Classes
+
+### Layout System
 ```html
-<div class="layout-123-145">
-  <div>Element 1</div>
-  <div>Element 2</div>
-  <div>Element 3</div>
-  <div>Element 4</div>
-  <div>Element 5</div>
+<!-- Explicit child-to-row mapping -->
+<div class="layout-123-456">  <!-- Children 1,2,3 in first row; 4,5,6 in second row -->
+<div class="layout-123-124">  <!-- Children 1,2,3 in first row; 1,2,4 in second row (1 and 2 span both rows) -->
+```
+
+**Example:**
+```html
+<div class="layout-123-456">
+  <div>One</div>
+  <div>Two</div>
+  <div>Three</div>
+  <div>Four</div>
+  <div>Five</div>
+  <div>Six</div>
+</div>
+<!-- Renders as:
+Row 1: One | Two | Three
+Row 2: Four | Five | Six
+-->
+
+<div class="layout-123-124">
+  <div>One</div>
+  <div>Two</div>
+  <div>Three</div>
+  <div>Four</div>
+</div>
+<!-- Renders as:
+Row 1: One | Two | Three
+Row 2: One | Two | Four (One and Two span both rows)
+-->
+```
+
+This is not a column or percentage-based grid, but a direct mapping of children to rows, allowing for overlaps and custom arrangements.
+
+### Spacing
+```html
+<!-- Margin -->
+<div class="m-1">          <!-- margin: 0.6em -->
+<div class="m-sm-2">       <!-- margin: 1.2em on small screens -->
+<div class="mx-3">         <!-- margin-left/right: 1.8em -->
+<div class="my-4">         <!-- margin-top/bottom: 2.4em -->
+<div class="ml-2">         <!-- margin-left: 1.2em -->
+
+<!-- Padding -->
+<div class="p-1">          <!-- padding: 0.6em -->
+<div class="p-sm-2">       <!-- padding: 1.2em on small screens -->
+```
+
+### Typography
+```html
+<!-- Font sizes -->
+<h1 class="fs-3xl">        <!-- font-size: 35px -->
+<p class="fs-md">          <!-- font-size: 16px -->
+<span class="fs-sm">       <!-- font-size: 14px -->
+
+<!-- Text alignment -->
+<p class="left">           <!-- text-align: left -->
+<p class="center">         <!-- text-align: center -->
+<p class="right">          <!-- text-align: right -->
+```
+
+### Positioning
+```html
+<div class="relative">     <!-- position: relative -->
+<div class="absolute">     <!-- position: absolute -->
+<div class="fixed">        <!-- position: fixed -->
+```
+
+### Display
+```html
+<div class="hidden">       <!-- display: none -->
+<div class="block">        <!-- display: block -->
+
+<!-- Responsive display -->
+<div class="show-sm">      <!-- display: initial on small screens -->
+<div class="hide-md">      <!-- display: none on medium screens -->
+<div class="block-lg">     <!-- display: block on large screens -->
+```
+
+### Visual Effects
+```html
+<div class="radius">       <!-- border-radius: 0.35em -->
+<div class="radius-sm">    <!-- border-radius: 4px -->
+<div class="radius-lg">    <!-- border-radius: 0.7em -->
+<div class="radius-xl">    <!-- border-radius: 40px -->
+```
+
+### Colors
+```html
+<div class="primary">      <!-- background-color: #008001 -->
+<div class="secondary">    <!-- background-color: #005500 -->
+<div class="highlight">    <!-- background-color: #FFB613 -->
+<div class="danger">       <!-- background-color: #B71234 -->
+```
+
+### Interactive Elements
+```html
+<div class="slider">       <!-- Carousel/slider functionality -->
+<div class="items">        <!-- Grid of items -->
+<div class="list">         <!-- List of things -->
+<div class="expand">       <!-- Expandable content -->
+<div class="popup">        <!-- Popup/overlay -->
+```
+
+## Breakpoints
+
+Core4 uses a comprehensive breakpoint system:
+
+- `sm`: 320px (Small mobile)
+- `mm`: 386px (Medium mobile)
+- `lm`: 466px (Large mobile)
+- `st`: 562px (Small tablet)
+- `mt`: 678px (Medium tablet)
+- `lt`: 818px (Large tablet)
+- `sd`: 987px (Small desktop)
+- `md`: 1191px (Medium desktop)
+- `ld`: 1500px (Large desktop)
+
+## Usage
+
+### Basic Setup
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="assets/styles/core.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="fs-3xl center">Hello Core4</h1>
+        <div class="layout-6-50 m-2">
+            <p class="fs-md">This is a responsive layout</p>
+        </div>
+    </div>
+</body>
+</html>
+```
+
+### Responsive Design
+```html
+<div class="layout-12-33 m-1 m-sm-2 m-md-3">
+    <h2 class="fs-xl fs-sm-2xl fs-md-3xl">Responsive Typography</h2>
+    <p class="hidden show-sm">Visible on small screens and up</p>
+    <p class="block hide-md">Hidden on medium screens and up</p>
 </div>
 ```
-The layout-123-145 class creates a grid with a two-row spanning first element and four elements in a 2x2 grid beside it, thus:
-```html
-+---+---+---+
-| 1 | 2 | 3 |
-+---+---+---+
-| 1 | 4 | 5 |
-+---+---+---+
-```
 
-### 2. Responsive Design Tools
+## Development
 
-- **Auto Grid**: Easily create responsive grid layouts with `.auto-grid`
-- **Auto Flex**: Flexible layouts with `.auto-flex`
-- **Responsive Classes**: Breakpoint-specific classes for fine-tuned control
+### Building CSS
+The framework uses SCSS for development. To build:
 
-### 3. Alignment Utilities
+1. Compile `assets/styles/dev/core.scss` to `assets/styles/core.css`
+2. Use the layout generator tool in `/tools/` to scan for used classes
+3. The system will automatically generate optimized CSS
 
-Simplify element alignment with our comprehensive alignment classes:
+### Layout Generator
+The layout generator tool scans HTML files for Core4 classes and generates optimized CSS. This ensures only used classes are included in the final build.
 
-- `.align-*` classes for various alignment options
-- Responsive alignment classes (e.g., `.align-md-mc` for middle centre on Medium Tablets and above)
+## Browser Support
 
-### 4. Typography
-
-- Responsive font size classes (e.g., `.fs-1`, `.fs-md-2`)
-- Text alignment utilities (e.g., `.text-centre`, `.text-md-left`)
-
-### 5. Colour System
-
-Easily apply colours to text and backgrounds:
-
-- `.{colour-name}` for text colour
-- `.bg-{colour-name}` for background colour
-
-### 6. Responsive Visibility
-
-Control element visibility across breakpoints:
-
-- `.d-{breakpoint}-on` to show elements at specific breakpoints
-- `.d-{breakpoint}-off` to hide elements at specific breakpoints
-
-## Getting Started
-
-As this project is in development, the setup process may change. Currently:
-
-1. Link to the CSS file within your HTML:
-
-   ```html
-   <link rel="stylesheet" href="path/to/core.css">
-   ```
-
-2. Customise the framework by modifying the variables in `_var.scss`
-
-3. Add your custom styles in `_custom.scss`
-
-## Customisation
-
-This framework is designed to be easily customisable. Key areas for customisation include:
-
-- Breakpoints (`$breakpoints`)
-- Colours (`$colors`)
-- Font sizes (`$font-sizes`)
-- Container width (`$container-width`)
-- Grid columns (`$grid-columns`)
-
-## Potential Benefits
-
-- **Intuitive Layout Creation**: Utilise the innovative layout system to quickly create complex, responsive layouts
-- **Rapid Development**: Use pre-built classes to quickly prototype and build layouts
-- **Responsive Design**: Built-in responsiveness for seamless multi-device support
-- **Customisable**: Easily adapt the framework to your project's specific needs
-- **Lightweight**: Only include what you need, keeping your stylesheets lean
-
-## Contributing
-
-As this project is in its early stages, I would greatly appreciate any contributions or feedback. If you have ideas on how to improve the framework or want to contribute code, please feel free to open an issue or submit a pull request.
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- IE11+ (with polyfills for CSS Grid)
+- Mobile browsers
 
 ## License
 
-This project is free and open for anyone to use, modify, or distribute.
+[Add your license here]
 
-Feel free to use it, fork it, and adapt it for your needs.
+## Contributing
 
-If you find it helpful, a mention of the original author is appreciated but not required.
-
-No warranties or conditions are provided. Use at your own discretion.
-
-**Note**: This framework is an experimental concept and is actively evolving. Features and APIs may change significantly as development progresses.
+[Add contribution guidelines here]
