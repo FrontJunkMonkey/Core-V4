@@ -66,7 +66,7 @@ export class CSSGenerator {
     // Get configuration - use workspace settings for per-project configuration
     const config = vscode.workspace.getConfiguration('core4');
     const includeDefaultStyles = config.get<boolean>('includeDefaultStyles', true);
-    
+
     // Debug: Log the setting value
     console.log('Core4: includeDefaultStyles setting =', includeDefaultStyles);
     console.log('Core4: Classes found =', Array.from(classes));
@@ -285,33 +285,83 @@ a {
     // Extract the layout pattern (e.g., "123-456" from "layout-123-456")
     const pattern = className.replace('layout-', '');
     const rows = pattern.split('-');
-    
-    let css = `.${className} {\n`;
-    css += `  display: grid;\n`;
-    css += `  grid-template-rows: repeat(${rows.length}, 1fr);\n`;
-    
-    // Generate grid-template-areas based on the pattern
-    const areas: string[] = [];
+
+    if (rows.length === 0) return '';
+
+    const numCols = rows[0].length;
+    const numRows = rows.length;
+
+    // Helper function to get character value (0-9 = 0-9, a-z = 10-35)
+    const getCharValue = (char: string): number => {
+      if (char >= '0' && char <= '9') return parseInt(char);
+      if (char >= 'a' && char <= 'z') return 10 + (char.charCodeAt(0) - 'a'.charCodeAt(0));
+      return -1; // Invalid character
+    };
+
+    // Parse the grid to find element positions and spans
+    const elementPositions = new Map<number, {
+      minRow: number;
+      maxRow: number;
+      minCol: number;
+      maxCol: number;
+      firstAppearance: { row: number; col: number };
+    }>();
+
     rows.forEach((row, rowIndex) => {
-      const children = row.split('').map(child => `child-${child}`);
-      areas.push(`"${children.join(' ')}"`);
-    });
-    
-    css += `  grid-template-areas:\n`;
-    areas.forEach(area => {
-      css += `    ${area}\n`;
-    });
-    css += `}\n\n`;
-    
-    // Generate child positioning
-    rows.forEach((row, rowIndex) => {
-      row.split('').forEach((child, childIndex) => {
-        css += `.${className} > *:nth-child(${child}) {\n`;
-        css += `  grid-area: child-${child};\n`;
-        css += `}\n`;
+      [...row].forEach((char, colIndex) => {
+        const value = getCharValue(char);
+        if (value === -1) return; // Skip invalid characters
+
+        if (!elementPositions.has(value)) {
+          elementPositions.set(value, {
+            minRow: rowIndex + 1,
+            maxRow: rowIndex + 1,
+            minCol: colIndex + 1,
+            maxCol: colIndex + 1,
+            firstAppearance: { row: rowIndex, col: colIndex }
+          });
+        } else {
+          const pos = elementPositions.get(value)!;
+          pos.minRow = Math.min(pos.minRow, rowIndex + 1);
+          pos.maxRow = Math.max(pos.maxRow, rowIndex + 1);
+          pos.minCol = Math.min(pos.minCol, colIndex + 1);
+          pos.maxCol = Math.max(pos.maxCol, colIndex + 1);
+        }
       });
     });
-    
+
+    // Sort elements by order of first appearance to assign nth-child indices
+    const sortedElements = Array.from(elementPositions.entries())
+      .sort(([a, posA], [b, posB]) => {
+        const rowDiff = posA.firstAppearance.row - posB.firstAppearance.row;
+        if (rowDiff !== 0) return rowDiff;
+        return posA.firstAppearance.col - posB.firstAppearance.col;
+      });
+
+    // Generate compact CSS
+    let css = `.${className} {\n`;
+    css += `  display: grid;\n`;
+    css += `  grid: repeat(${numRows}, 1fr) / repeat(${numCols}, 1fr);\n`;
+    css += `}\n\n`;
+
+    // Only generate rules for elements that need explicit positioning
+    sortedElements.forEach(([value, pos], index) => {
+      const childIndex = index + 1;
+      const spans = pos.minRow !== pos.maxRow || pos.minCol !== pos.maxCol;
+
+      // Calculate what the "natural" position would be for this child index
+      const naturalRow = Math.floor((childIndex - 1) / numCols) + 1;
+      const naturalCol = ((childIndex - 1) % numCols) + 1;
+      const isInNaturalPosition = pos.minRow === naturalRow && pos.minCol === naturalCol && !spans;
+
+      // Only add rule if element spans multiple cells or is out of natural order
+      if (spans || !isInNaturalPosition) {
+        css += `.${className} > *:nth-child(${childIndex}) {\n`;
+        css += `  grid-area: ${pos.minRow} / ${pos.minCol} / ${pos.maxRow + 1} / ${pos.maxCol + 1};\n`;
+        css += `}\n`;
+      }
+    });
+
     return css;
   }
 
@@ -319,20 +369,20 @@ a {
     const parts = className.split('-');
     const property = parts[0] === 'm' ? 'margin' : 'padding';
     const size = parts[1];
-    
+
     if (size in this.spacingValues) {
       let css = `.${className} { ${property}: ${this.spacingValues[size]} !important; }\n`;
-      
+
       // Handle directional variants (mx, my, px, py)
       if (parts.length === 2 && (className.startsWith('mx-') || className.startsWith('my-') || className.startsWith('px-') || className.startsWith('py-'))) {
         const direction = parts[0].substring(1); // 'x' or 'y'
         const dirProperty = direction === 'x' ? `${property}-left, ${property}-right` : `${property}-top, ${property}-bottom`;
         css = `.${className} { ${dirProperty}: ${this.spacingValues[size]} !important; }\n`;
       }
-      
+
       return css;
     }
-    
+
     return '';
   }
 
@@ -352,7 +402,7 @@ a {
       'light': '300',
       'medium': '500'
     };
-    
+
     if (weight in weightMap) {
       return `.${className} { font-weight: ${weightMap[weight]}; }\n`;
     }
@@ -363,23 +413,23 @@ a {
     const parts = className.split('-');
     const action = parts[0]; // 'show' or 'hide'
     const breakpoint = parts[1];
-    
+
     if (breakpoint in this.breakpoints) {
       const displayValue = action === 'show' ? 'block' : 'none';
       return `@media (min-width: ${this.breakpoints[breakpoint]}) {\n  .${className} { display: ${displayValue} !important; }\n}\n`;
     }
-    
+
     return '';
   }
 
   private generateMaxLinesCSS(className: string): string {
     const lines = className.replace('max-lines-', '');
     const lineCount = parseInt(lines);
-    
+
     if (!isNaN(lineCount)) {
       return `.${className} {\n  display: -webkit-box;\n  -webkit-box-orient: vertical;\n  -webkit-line-clamp: ${lineCount};\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n`;
     }
-    
+
     return '';
   }
 
@@ -390,7 +440,7 @@ a {
   private generateGapCSS(className: string): string {
     const parts = className.split('-');
     const size = parts[1];
-    
+
     const gapMultipliers: Record<string, number> = {
       'xs': 0.375,
       'sm': 0.75,
@@ -400,18 +450,18 @@ a {
       '2xl': 4.5,
       '3xl': 6
     };
-    
+
     if (size in gapMultipliers) {
       const gapValue = `calc((0.7em + 0.3vw) * ${gapMultipliers[size]})`;
       return `.${className} { gap: ${gapValue}; }\n`;
     }
-    
+
     return '';
   }
 
   private generateAlignmentCSS(className: string): string {
     const alignment = className.replace('align-', '');
-    
+
     const alignmentMap: Record<string, string> = {
       'tl': 'flex-start left',
       'tc': 'flex-start center',
@@ -423,12 +473,12 @@ a {
       'bc': 'flex-end center',
       'br': 'flex-end right'
     };
-    
+
     if (alignment in alignmentMap) {
       const [alignContent, textAlign] = alignmentMap[alignment].split(' ');
       return `.${className} {\n  align-content: ${alignContent};\n  align-items: ${alignContent};\n  text-align: ${textAlign};\n}\n`;
     }
-    
+
     return '';
   }
-} 
+}
