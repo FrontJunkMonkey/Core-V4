@@ -258,28 +258,77 @@ a {
         // Extract the layout pattern (e.g., "123-456" from "layout-123-456")
         const pattern = className.replace('layout-', '');
         const rows = pattern.split('-');
-        let css = `.${className} {\n`;
-        css += `  display: grid;\n`;
-        css += `  grid-template-rows: repeat(${rows.length}, 1fr);\n`;
-        // Generate grid-template-areas based on the pattern
-        const areas = [];
+
+        if (rows.length === 0) return '';
+
+        const numCols = rows[0].length;
+        const numRows = rows.length;
+
+        // Helper function to get character value (0-9 = 0-9, a-z = 10-35)
+        const getCharValue = (char) => {
+            if (char >= '0' && char <= '9') return parseInt(char);
+            if (char >= 'a' && char <= 'z') return 10 + (char.charCodeAt(0) - 'a'.charCodeAt(0));
+            return -1; // Invalid character
+        };
+
+        // Parse the grid to find element positions and spans
+        const elementPositions = new Map();
+
         rows.forEach((row, rowIndex) => {
-            const children = row.split('').map(child => `child-${child}`);
-            areas.push(`"${children.join(' ')}"`);
-        });
-        css += `  grid-template-areas:\n`;
-        areas.forEach(area => {
-            css += `    ${area}\n`;
-        });
-        css += `}\n\n`;
-        // Generate child positioning
-        rows.forEach((row, rowIndex) => {
-            row.split('').forEach((child, childIndex) => {
-                css += `.${className} > *:nth-child(${child}) {\n`;
-                css += `  grid-area: child-${child};\n`;
-                css += `}\n`;
+            [...row].forEach((char, colIndex) => {
+                const value = getCharValue(char);
+                if (value === -1) return; // Skip invalid characters
+
+                if (!elementPositions.has(value)) {
+                    elementPositions.set(value, {
+                        minRow: rowIndex + 1,
+                        maxRow: rowIndex + 1,
+                        minCol: colIndex + 1,
+                        maxCol: colIndex + 1,
+                        firstAppearance: { row: rowIndex, col: colIndex }
+                    });
+                } else {
+                    const pos = elementPositions.get(value);
+                    pos.minRow = Math.min(pos.minRow, rowIndex + 1);
+                    pos.maxRow = Math.max(pos.maxRow, rowIndex + 1);
+                    pos.minCol = Math.min(pos.minCol, colIndex + 1);
+                    pos.maxCol = Math.max(pos.maxCol, colIndex + 1);
+                }
             });
         });
+
+        // Sort elements by order of first appearance to assign nth-child indices
+        const sortedElements = Array.from(elementPositions.entries())
+            .sort(([a, posA], [b, posB]) => {
+                const rowDiff = posA.firstAppearance.row - posB.firstAppearance.row;
+                if (rowDiff !== 0) return rowDiff;
+                return posA.firstAppearance.col - posB.firstAppearance.col;
+            });
+
+        // Generate compact CSS
+        let css = `.${className} {\n`;
+        css += `  display: grid;\n`;
+        css += `  grid: repeat(${numRows}, 1fr) / repeat(${numCols}, 1fr);\n`;
+        css += `}\n\n`;
+
+        // Only generate rules for elements that need explicit positioning
+        sortedElements.forEach(([value, pos], index) => {
+            const childIndex = index + 1;
+            const spans = pos.minRow !== pos.maxRow || pos.minCol !== pos.maxCol;
+
+            // Calculate what the "natural" position would be for this child index
+            const naturalRow = Math.floor((childIndex - 1) / numCols) + 1;
+            const naturalCol = ((childIndex - 1) % numCols) + 1;
+            const isInNaturalPosition = pos.minRow === naturalRow && pos.minCol === naturalCol && !spans;
+
+            // Only add rule if element spans multiple cells or is out of natural order
+            if (spans || !isInNaturalPosition) {
+                css += `.${className} > *:nth-child(${childIndex}) {\n`;
+                css += `  grid-area: ${pos.minRow} / ${pos.minCol} / ${pos.maxRow + 1} / ${pos.maxCol + 1};\n`;
+                css += `}\n`;
+            }
+        });
+
         return css;
     }
     generateSpacingCSS(className) {
