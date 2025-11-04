@@ -88,7 +88,14 @@ function activate(context) {
             vscode.window.showInformationMessage('Core4: Watching started');
         }
     });
-    context.subscriptions.push(generateCommand, toggleCommand, statusBarItem);
+    // Listen for configuration changes to clear caches
+    const configChangeListener = vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('core4')) {
+            cssGenerator.clearCaches();
+            console.log('Core4: Configuration changed, cleared caches');
+        }
+    });
+    context.subscriptions.push(generateCommand, toggleCommand, statusBarItem, configChangeListener);
     // Initialize state
     initializeState();
 }
@@ -102,8 +109,8 @@ async function generateCSS() {
         }
         const detector = new classDetector_1.ClassDetector();
         const generator = new cssGenerator_1.CSSGenerator();
-        // Scan all HTML files in workspace
-        const files = await vscode.workspace.findFiles('**/*.{html,php,vue,jsx,tsx}');
+        // Scan all supported files in workspace
+        const files = await vscode.workspace.findFiles('**/*.{html,htm,php,vue,jsx,tsx,asp,aspx,cshtml,razor,erb,jsp,haml,slim,svelte,astro,liquid,twig,blade.php,mustache,hbs}');
         let allClasses = new Set();
         for (const file of files) {
             const content = await vscode.workspace.fs.readFile(file);
@@ -115,7 +122,6 @@ async function generateCSS() {
         const config = vscode.workspace.getConfiguration('core4');
         const minify = config.get('minify', true);
         const outputPath = config.get('outputPath', './styles/core4.css');
-        const includeDefaultStyles = config.get('includeDefaultStyles', true);
         if (allClasses.size === 0) {
             // Delete CSS file if no classes found
             try {
@@ -124,13 +130,21 @@ async function generateCSS() {
                 vscode.window.showInformationMessage('No Core4 classes found, deleted CSS file.');
             }
             catch (error) {
-                vscode.window.showInformationMessage('No Core4 classes found in your HTML files.');
+                vscode.window.showInformationMessage('No Core4 classes found in your files.');
             }
             return;
         }
         // Generate CSS
         const css = generator.generateCSS(allClasses, minify);
         const outputUri = vscode.Uri.joinPath(workspaceFolders[0].uri, outputPath);
+        // Ensure directory exists
+        const outputDir = vscode.Uri.joinPath(outputUri, '..');
+        try {
+            await vscode.workspace.fs.createDirectory(outputDir);
+        }
+        catch (error) {
+            // Directory might already exist
+        }
         await vscode.workspace.fs.writeFile(outputUri, Buffer.from(css));
         vscode.window.showInformationMessage(`Core4 CSS generated with ${allClasses.size} classes!`);
     }

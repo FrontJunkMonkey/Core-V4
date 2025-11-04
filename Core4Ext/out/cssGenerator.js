@@ -4,6 +4,9 @@ exports.CSSGenerator = void 0;
 const vscode = require("vscode");
 class CSSGenerator {
     constructor() {
+        this.cssCache = new Map();
+        this.configCache = null;
+        this.configCacheTime = 0;
         this.spacingValues = {
             '0': '0',
             'half': '0.3em',
@@ -60,12 +63,25 @@ class CSSGenerator {
             'ld': '1500px'
         };
     }
+    // Cache configuration for 5 seconds to avoid repeated calls
+    getConfig() {
+        const now = Date.now();
+        if (!this.configCache || (now - this.configCacheTime) > 5000) {
+            this.configCache = vscode.workspace.getConfiguration('core4');
+            this.configCacheTime = now;
+        }
+        return this.configCache;
+    }
+    // Clear caches when configuration changes
+    clearCaches() {
+        this.cssCache.clear();
+        this.configCache = null;
+    }
     generateCSS(classes, minify = true) {
         let css = '';
-        // Get configuration - use workspace settings for per-project configuration
-        const config = vscode.workspace.getConfiguration('core4');
+        // Get configuration
+        const config = this.getConfig();
         const includeDefaultStyles = config.get('includeDefaultStyles', true);
-        // Debug: Log the setting value
         console.log('Core4: includeDefaultStyles setting =', includeDefaultStyles);
         console.log('Core4: Classes found =', Array.from(classes));
         // If no classes found, return empty CSS
@@ -82,9 +98,9 @@ class CSSGenerator {
         else {
             console.log('Core4: Skipping base and element styles - only generating used classes');
         }
-        // Generate classes based on what's used
+        // Generate classes based on what's used (with caching)
         classes.forEach(className => {
-            css += this.generateClassCSS(className);
+            css += this.getCachedClassCSS(className);
         });
         // Minify if requested
         if (minify) {
@@ -92,19 +108,389 @@ class CSSGenerator {
         }
         return css;
     }
+    getCachedClassCSS(className) {
+        if (this.cssCache.has(className)) {
+            return this.cssCache.get(className);
+        }
+        const css = this.generateClassCSS(className);
+        this.cssCache.set(className, css);
+        return css;
+    }
+    generateClassCSS(className) {
+        // Layout classes (including responsive)
+        if (className.startsWith('layout-')) {
+            return this.generateLayoutCSS(className);
+        }
+        // Width classes
+        if (className.startsWith('w-')) {
+            return this.generateWidthCSS(className);
+        }
+        // Height classes
+        if (className.startsWith('h-')) {
+            return this.generateHeightCSS(className);
+        }
+        // Space classes
+        if (className.startsWith('space-')) {
+            return this.generateSpaceCSS(className);
+        }
+        // Flexbox classes
+        if (this.isFlexboxClass(className)) {
+            return this.generateFlexboxCSS(className);
+        }
+        // Text utility classes
+        if (this.isTextUtilityClass(className)) {
+            return this.generateTextUtilityCSS(className);
+        }
+        // Border and rounded classes
+        if (className.startsWith('border') || className.startsWith('rounded')) {
+            return this.generateBorderCSS(className);
+        }
+        // Overflow classes
+        if (className.startsWith('overflow-')) {
+            return this.generateOverflowCSS(className);
+        }
+        // Text size classes (alternative to fs-)
+        if (className.startsWith('text-') && this.isTextSizeClass(className)) {
+            return this.generateTextSizeCSS(className);
+        }
+        // Spacing classes (margin/padding)
+        if (className.startsWith('m-') || className.startsWith('p-')) {
+            return this.generateSpacingCSS(className);
+        }
+        // Font size classes
+        if (className.startsWith('fs-')) {
+            return this.generateFontSizeCSS(className);
+        }
+        // Font weight classes
+        if (className.startsWith('fw-')) {
+            return this.generateFontWeightCSS(className);
+        }
+        // Color classes
+        const config = this.getConfig();
+        const colorMap = this.getColorMap(config);
+        if (className in colorMap) {
+            return `.${className} { color: ${colorMap[className]}; }\n`;
+        }
+        // Background color classes
+        if (className.startsWith('bg-')) {
+            const colorName = className.substring(3);
+            if (colorName in colorMap) {
+                return `.${className} { background-color: ${colorMap[colorName]}; }\n`;
+            }
+        }
+        // Responsive display classes
+        if (className.startsWith('show-') || className.startsWith('hide-')) {
+            return this.generateResponsiveDisplayCSS(className);
+        }
+        // Max lines classes
+        if (className.startsWith('max-lines-')) {
+            return this.generateMaxLinesCSS(className);
+        }
+        // Gap classes
+        if (className === 'gap') {
+            return this.generateDefaultGapCSS();
+        }
+        if (className.startsWith('gap-')) {
+            return this.generateGapCSS(className);
+        }
+        // Alignment classes
+        if (className.startsWith('align-')) {
+            return this.generateAlignmentCSS(className);
+        }
+        // Utility classes
+        return this.generateUtilityCSS(className);
+    }
+    // NEW UTILITY METHODS
+    generateWidthCSS(className) {
+        const widthMap = {
+            'w-full': '100%',
+            'w-1/2': '50%',
+            'w-1/3': '33.333333%',
+            'w-2/3': '66.666667%',
+            'w-1/4': '25%',
+            'w-3/4': '75%',
+            'w-screen': '100vw'
+        };
+        if (className in widthMap) {
+            return `.${className} { width: ${widthMap[className]}; }\n`;
+        }
+        return '';
+    }
+    generateHeightCSS(className) {
+        if (className === 'h-screen') {
+            return `.${className} { height: 100vh; }\n`;
+        }
+        if (className === 'h-full') {
+            return `.${className} { height: 100%; }\n`;
+        }
+        if (className === 'h-auto') {
+            return `.${className} { height: auto; }\n`;
+        }
+        // Handle numeric heights like h-64
+        const match = className.match(/h-(\d+)/);
+        if (match) {
+            const value = parseInt(match[1]) * 0.25; // 0.25rem per unit
+            return `.${className} { height: ${value}rem; }\n`;
+        }
+        return '';
+    }
+    generateSpaceCSS(className) {
+        const match = className.match(/space-(x|y)-([1-8])/);
+        if (!match)
+            return '';
+        const direction = match[1];
+        const size = match[2];
+        const spacing = this.spacingValues[size];
+        if (!spacing)
+            return '';
+        if (direction === 'x') {
+            return `.${className} > * + * { margin-left: ${spacing}; }\n`;
+        }
+        else {
+            return `.${className} > * + * { margin-top: ${spacing}; }\n`;
+        }
+    }
+    isFlexboxClass(className) {
+        const flexClasses = [
+            'flex', 'flex-col', 'flex-row', 'flex-wrap', 'flex-nowrap',
+            'items-start', 'items-center', 'items-end', 'items-stretch',
+            'justify-start', 'justify-center', 'justify-between', 'justify-around', 'justify-evenly'
+        ];
+        return flexClasses.includes(className);
+    }
+    generateFlexboxCSS(className) {
+        const flexMap = {
+            'flex': 'display: flex',
+            'flex-col': 'display: flex; flex-direction: column',
+            'flex-row': 'display: flex; flex-direction: row',
+            'flex-wrap': 'flex-wrap: wrap',
+            'flex-nowrap': 'flex-wrap: nowrap',
+            'items-start': 'align-items: flex-start',
+            'items-center': 'align-items: center',
+            'items-end': 'align-items: flex-end',
+            'items-stretch': 'align-items: stretch',
+            'justify-start': 'justify-content: flex-start',
+            'justify-center': 'justify-content: center',
+            'justify-between': 'justify-content: space-between',
+            'justify-around': 'justify-content: space-around',
+            'justify-evenly': 'justify-content: space-evenly'
+        };
+        if (className in flexMap) {
+            return `.${className} { ${flexMap[className]}; }\n`;
+        }
+        return '';
+    }
+    isTextUtilityClass(className) {
+        const textUtils = ['uppercase', 'lowercase', 'capitalize', 'text-center', 'text-left', 'text-right'];
+        return textUtils.includes(className);
+    }
+    generateTextUtilityCSS(className) {
+        const textMap = {
+            'uppercase': 'text-transform: uppercase',
+            'lowercase': 'text-transform: lowercase',
+            'capitalize': 'text-transform: capitalize',
+            'text-center': 'text-align: center',
+            'text-left': 'text-align: left',
+            'text-right': 'text-align: right'
+        };
+        if (className in textMap) {
+            return `.${className} { ${textMap[className]}; }\n`;
+        }
+        return '';
+    }
+    generateBorderCSS(className) {
+        const config = this.getConfig();
+        const borderRadius = config.get('borderRadius', '0.35em');
+        const borderMap = {
+            'border': 'border: 1px solid #e5e7eb',
+            'border-2': 'border: 2px solid #e5e7eb',
+            'border-t': 'border-top: 1px solid #e5e7eb',
+            'border-r': 'border-right: 1px solid #e5e7eb',
+            'border-b': 'border-bottom: 1px solid #e5e7eb',
+            'border-l': 'border-left: 1px solid #e5e7eb',
+            'rounded': `border-radius: ${borderRadius}`,
+            'rounded-sm': 'border-radius: 0.125rem',
+            'rounded-lg': 'border-radius: 0.5rem',
+            'rounded-full': 'border-radius: 9999px'
+        };
+        if (className in borderMap) {
+            return `.${className} { ${borderMap[className]}; }\n`;
+        }
+        return '';
+    }
+    generateOverflowCSS(className) {
+        const overflowMap = {
+            'overflow-hidden': 'overflow: hidden',
+            'overflow-auto': 'overflow: auto',
+            'overflow-scroll': 'overflow: scroll',
+            'overflow-visible': 'overflow: visible'
+        };
+        if (className in overflowMap) {
+            return `.${className} { ${overflowMap[className]}; }\n`;
+        }
+        return '';
+    }
+    isTextSizeClass(className) {
+        const textSizes = ['text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl'];
+        return textSizes.includes(className);
+    }
+    generateTextSizeCSS(className) {
+        const textSizeMap = {
+            'text-xs': '0.75rem',
+            'text-sm': '0.875rem',
+            'text-base': '1rem',
+            'text-lg': '1.125rem',
+            'text-xl': '1.25rem',
+            'text-2xl': '1.5rem',
+            'text-3xl': '1.875rem'
+        };
+        const size = textSizeMap[className];
+        if (size) {
+            return `.${className} { font-size: ${size}; }\n`;
+        }
+        return '';
+    }
+    getColorMap(config) {
+        return {
+            primary: config.get('primaryColor', '#008001'),
+            secondary: config.get('secondaryColor', '#005500'),
+            highlight: config.get('highlightColor', '#ff6b35'),
+            danger: '#dc3545',
+            success: '#10b981',
+            warning: '#f59e0b',
+            info: '#3b82f6',
+            black: '#000000',
+            white: '#ffffff',
+            'grey-lightest': '#f8f9fa',
+            'grey-darkest': '#343a40',
+            'trans-grey': 'rgba(0,0,0,0.1)',
+            'trans-black': 'rgba(0,0,0,0.8)',
+            'dark-violet': '#4a148c',
+            'light-violet': '#e1bee7'
+        };
+    }
+    generateUtilityCSS(className) {
+        const config = this.getConfig();
+        const borderRadius = config.get('borderRadius', '0.35em');
+        const shadowColor = config.get('shadowColor', 'rgba(0,0,0,0.1)');
+        switch (className) {
+            case 'container':
+                return `.${className} { width: 100%; max-width: 1550px; margin: 0 auto; }\n`;
+            case 'relative':
+                return `.${className} { position: relative; }\n`;
+            case 'absolute':
+                return `.${className} { position: absolute; }\n`;
+            case 'fixed':
+                return `.${className} { position: fixed; }\n`;
+            case 'left':
+                return `.${className} { text-align: left !important; }\n`;
+            case 'center':
+                return `.${className} { text-align: center !important; }\n`;
+            case 'right':
+                return `.${className} { text-align: right !important; }\n`;
+            case 'show':
+                return `.${className} { display: block !important; }\n`;
+            case 'hide':
+                return `.${className} { display: none !important; }\n`;
+            case 'radius':
+                return `.${className} { border-radius: ${borderRadius}; }\n`;
+            case 'shadow':
+                return `.${className} { box-shadow: 0 4px 6px ${shadowColor}; }\n`;
+        }
+        return '';
+    }
+    // LAYOUT CSS GENERATION (with responsive support)
+    generateLayoutCSS(className) {
+        // Check for responsive layout first
+        const responsiveMatch = className.match(/layout-([a-z]{2})-(.+)/);
+        if (responsiveMatch) {
+            const breakpoint = responsiveMatch[1];
+            const pattern = responsiveMatch[2];
+            if (breakpoint in this.breakpoints) {
+                const baseCSS = this.generateLayoutCSSInternal(`layout-${pattern}`);
+                // Wrap in media query
+                return `@media (min-width: ${this.breakpoints[breakpoint]}) {\n${baseCSS.replace(/\n/g, '\n  ')}\n}\n`;
+            }
+        }
+        return this.generateLayoutCSSInternal(className);
+    }
+    generateLayoutCSSInternal(className) {
+        const pattern = className.replace('layout-', '');
+        const rows = pattern.split('-');
+        if (rows.length === 0)
+            return '';
+        const numCols = rows[0].length;
+        const numRows = rows.length;
+        const getCharValue = (char) => {
+            if (char >= '0' && char <= '9')
+                return parseInt(char);
+            if (char >= 'a' && char <= 'z')
+                return 10 + (char.charCodeAt(0) - 'a'.charCodeAt(0));
+            return -1;
+        };
+        const elementPositions = new Map();
+        rows.forEach((row, rowIndex) => {
+            [...row].forEach((char, colIndex) => {
+                const value = getCharValue(char);
+                if (value === -1)
+                    return;
+                if (!elementPositions.has(value)) {
+                    elementPositions.set(value, {
+                        minRow: rowIndex + 1,
+                        maxRow: rowIndex + 1,
+                        minCol: colIndex + 1,
+                        maxCol: colIndex + 1,
+                        firstAppearance: { row: rowIndex, col: colIndex }
+                    });
+                }
+                else {
+                    const pos = elementPositions.get(value);
+                    pos.minRow = Math.min(pos.minRow, rowIndex + 1);
+                    pos.maxRow = Math.max(pos.maxRow, rowIndex + 1);
+                    pos.minCol = Math.min(pos.minCol, colIndex + 1);
+                    pos.maxCol = Math.max(pos.maxCol, colIndex + 1);
+                }
+            });
+        });
+        const sortedElements = Array.from(elementPositions.entries())
+            .sort(([a, posA], [b, posB]) => {
+            const rowDiff = posA.firstAppearance.row - posB.firstAppearance.row;
+            if (rowDiff !== 0)
+                return rowDiff;
+            return posA.firstAppearance.col - posB.firstAppearance.col;
+        });
+        let css = `.${className} {\n`;
+        css += `  display: grid;\n`;
+        css += `  grid: repeat(${numRows}, 1fr) / repeat(${numCols}, 1fr);\n`;
+        css += `}\n\n`;
+        sortedElements.forEach(([value, pos], index) => {
+            const childIndex = index + 1;
+            const spans = pos.minRow !== pos.maxRow || pos.minCol !== pos.maxCol;
+            const naturalRow = Math.floor((childIndex - 1) / numCols) + 1;
+            const naturalCol = ((childIndex - 1) % numCols) + 1;
+            const isInNaturalPosition = pos.minRow === naturalRow && pos.minCol === naturalCol && !spans;
+            if (spans || !isInNaturalPosition) {
+                css += `.${className} > *:nth-child(${childIndex}) {\n`;
+                css += `  grid-area: ${pos.minRow} / ${pos.minCol} / ${pos.maxRow + 1} / ${pos.maxCol + 1};\n`;
+                css += `}\n`;
+            }
+        });
+        return css;
+    }
+    // EXISTING METHODS (unchanged)
     minifyCSS(css) {
         return css
-            .replace(/\/\*[\s\S]*?\*\//g, '') // Remove comments
-            .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-            .replace(/\s*{\s*/g, '{') // Remove spaces around braces
-            .replace(/\s*}\s*/g, '}') // Remove spaces around braces
-            .replace(/\s*:\s*/g, ':') // Remove spaces around colons
-            .replace(/\s*;\s*/g, ';') // Remove spaces around semicolons
-            .replace(/\s*,\s*/g, ',') // Remove spaces around commas
-            .trim(); // Remove leading/trailing whitespace
+            .replace(/\/\*[\s\S]*?\*\//g, '')
+            .replace(/\s+/g, ' ')
+            .replace(/\s*{\s*/g, '{')
+            .replace(/\s*}\s*/g, '}')
+            .replace(/\s*:\s*/g, ':')
+            .replace(/\s*;\s*/g, ';')
+            .replace(/\s*,\s*/g, ',')
+            .trim();
     }
     generateBaseStyles() {
-        const config = vscode.workspace.getConfiguration('core4');
+        const config = this.getConfig();
         const fontFamily = config.get('fontFamily', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif');
         return `
 /* Core4 Base Styles */
@@ -120,7 +506,7 @@ body {
 `;
     }
     generateElementStyles() {
-        const config = vscode.workspace.getConfiguration('core4');
+        const config = this.getConfig();
         const primaryColor = config.get('primaryColor', '#008001');
         const secondaryColor = config.get('secondaryColor', '#005500');
         const borderRadius = config.get('borderRadius', '0.35em');
@@ -156,141 +542,14 @@ a {
 }
 `;
     }
-    generateClassCSS(className) {
-        // Layout classes
-        if (className.startsWith('layout-')) {
-            return this.generateLayoutCSS(className);
-        }
-        // Spacing classes (margin/padding)
-        if (className.startsWith('m-') || className.startsWith('p-')) {
-            return this.generateSpacingCSS(className);
-        }
-        // Font size classes
-        if (className.startsWith('fs-')) {
-            return this.generateFontSizeCSS(className);
-        }
-        // Font weight classes
-        if (className.startsWith('fw-')) {
-            return this.generateFontWeightCSS(className);
-        }
-        // Color classes
-        const config = vscode.workspace.getConfiguration('core4');
-        const primaryColor = config.get('primaryColor', '#008001');
-        const secondaryColor = config.get('secondaryColor', '#005500');
-        const highlightColor = config.get('highlightColor', '#ff6b35');
-        // Use config values for brand colors, fallback to predefined for semantic colors
-        const colorMap = {
-            primary: primaryColor,
-            secondary: secondaryColor,
-            highlight: highlightColor,
-            danger: '#dc3545',
-            success: '#28a745',
-            warning: '#ffc107',
-            info: '#17a2b8',
-            black: '#000000',
-            white: '#ffffff',
-            'grey-lightest': '#f8f9fa',
-            'grey-darkest': '#343a40',
-            'trans-grey': 'rgba(0,0,0,0.1)',
-            'trans-black': 'rgba(0,0,0,0.8)',
-            'dark-violet': '#4a148c',
-            'light-violet': '#e1bee7'
-        };
-        if (className in colorMap) {
-            return `.${className} { color: ${colorMap[className]}; }\n`;
-        }
-        // Background color classes
-        if (className.startsWith('bg-')) {
-            const colorName = className.substring(3);
-            if (colorName in colorMap) {
-                return `.${className} { background-color: ${colorMap[colorName]}; }\n`;
-            }
-        }
-        // Responsive display classes
-        if (className.startsWith('show-') || className.startsWith('hide-')) {
-            return this.generateResponsiveDisplayCSS(className);
-        }
-        // Max lines classes
-        if (className.startsWith('max-lines-')) {
-            return this.generateMaxLinesCSS(className);
-        }
-        // Gap classes
-        if (className === 'gap') {
-            return this.generateDefaultGapCSS();
-        }
-        if (className.startsWith('gap-')) {
-            return this.generateGapCSS(className);
-        }
-        // Alignment classes
-        if (className.startsWith('align-')) {
-            return this.generateAlignmentCSS(className);
-        }
-        // Utility classes
-        const borderRadius = config.get('borderRadius', '0.35em');
-        const shadowColor = config.get('shadowColor', 'rgba(0,0,0,0.1)');
-        switch (className) {
-            case 'container':
-                return `.${className} { width: 100%; max-width: 1550px; margin: 0 auto; }\n`;
-            case 'relative':
-                return `.${className} { position: relative; }\n`;
-            case 'absolute':
-                return `.${className} { position: absolute; }\n`;
-            case 'fixed':
-                return `.${className} { position: fixed; }\n`;
-            case 'left':
-                return `.${className} { text-align: left !important; }\n`;
-            case 'center':
-                return `.${className} { text-align: center !important; }\n`;
-            case 'right':
-                return `.${className} { text-align: right !important; }\n`;
-            case 'show':
-                return `.${className} { display: block !important; }\n`;
-            case 'hide':
-                return `.${className} { display: none !important; }\n`;
-            case 'radius':
-                return `.${className} { border-radius: ${borderRadius}; }\n`;
-            case 'shadow':
-                return `.${className} { box-shadow: 0 4px 6px ${shadowColor}; }\n`;
-        }
-        return '';
-    }
-    generateLayoutCSS(className) {
-        // Extract the layout pattern (e.g., "123-456" from "layout-123-456")
-        const pattern = className.replace('layout-', '');
-        const rows = pattern.split('-');
-        let css = `.${className} {\n`;
-        css += `  display: grid;\n`;
-        css += `  grid-template-rows: repeat(${rows.length}, 1fr);\n`;
-        // Generate grid-template-areas based on the pattern
-        const areas = [];
-        rows.forEach((row, rowIndex) => {
-            const children = row.split('').map(child => `child-${child}`);
-            areas.push(`"${children.join(' ')}"`);
-        });
-        css += `  grid-template-areas:\n`;
-        areas.forEach(area => {
-            css += `    ${area}\n`;
-        });
-        css += `}\n\n`;
-        // Generate child positioning
-        rows.forEach((row, rowIndex) => {
-            row.split('').forEach((child, childIndex) => {
-                css += `.${className} > *:nth-child(${child}) {\n`;
-                css += `  grid-area: child-${child};\n`;
-                css += `}\n`;
-            });
-        });
-        return css;
-    }
     generateSpacingCSS(className) {
         const parts = className.split('-');
         const property = parts[0] === 'm' ? 'margin' : 'padding';
         const size = parts[1];
         if (size in this.spacingValues) {
             let css = `.${className} { ${property}: ${this.spacingValues[size]} !important; }\n`;
-            // Handle directional variants (mx, my, px, py)
             if (parts.length === 2 && (className.startsWith('mx-') || className.startsWith('my-') || className.startsWith('px-') || className.startsWith('py-'))) {
-                const direction = parts[0].substring(1); // 'x' or 'y'
+                const direction = parts[0].substring(1);
                 const dirProperty = direction === 'x' ? `${property}-left, ${property}-right` : `${property}-top, ${property}-bottom`;
                 css = `.${className} { ${dirProperty}: ${this.spacingValues[size]} !important; }\n`;
             }
@@ -320,7 +579,7 @@ a {
     }
     generateResponsiveDisplayCSS(className) {
         const parts = className.split('-');
-        const action = parts[0]; // 'show' or 'hide'
+        const action = parts[0];
         const breakpoint = parts[1];
         if (breakpoint in this.breakpoints) {
             const displayValue = action === 'show' ? 'block' : 'none';

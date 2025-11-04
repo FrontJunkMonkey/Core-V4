@@ -1,6 +1,26 @@
 import * as vscode from 'vscode';
 
 export class CSSGenerator {
+  private cssCache = new Map<string, string>();
+  private configCache: vscode.WorkspaceConfiguration | null = null;
+  private configCacheTime = 0;
+
+  // Cache configuration for 5 seconds to avoid repeated calls
+  private getConfig(): vscode.WorkspaceConfiguration {
+    const now = Date.now();
+    if (!this.configCache || (now - this.configCacheTime) > 5000) {
+      this.configCache = vscode.workspace.getConfiguration('core4');
+      this.configCacheTime = now;
+    }
+    return this.configCache;
+  }
+
+  // Clear caches when configuration changes
+  clearCaches(): void {
+    this.cssCache.clear();
+    this.configCache = null;
+  }
+
   private spacingValues: Record<string, string> = {
     '0': '0',
     'half': '0.3em',
@@ -63,11 +83,10 @@ export class CSSGenerator {
   generateCSS(classes: Set<string>, minify: boolean = true): string {
     let css = '';
 
-    // Get configuration - use workspace settings for per-project configuration
-    const config = vscode.workspace.getConfiguration('core4');
+    // Get configuration
+    const config = this.getConfig();
     const includeDefaultStyles = config.get<boolean>('includeDefaultStyles', true);
 
-    // Debug: Log the setting value
     console.log('Core4: includeDefaultStyles setting =', includeDefaultStyles);
     console.log('Core4: Classes found =', Array.from(classes));
 
@@ -86,9 +105,9 @@ export class CSSGenerator {
       console.log('Core4: Skipping base and element styles - only generating used classes');
     }
 
-    // Generate classes based on what's used
+    // Generate classes based on what's used (with caching)
     classes.forEach(className => {
-      css += this.generateClassCSS(className);
+      css += this.getCachedClassCSS(className);
     });
 
     // Minify if requested
@@ -99,79 +118,60 @@ export class CSSGenerator {
     return css;
   }
 
-  private minifyCSS(css: string): string {
-    return css
-      .replace(/\/\*[\s\S]*?\*\//g, '') // Remove comments
-      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-      .replace(/\s*{\s*/g, '{') // Remove spaces around braces
-      .replace(/\s*}\s*/g, '}') // Remove spaces around braces
-      .replace(/\s*:\s*/g, ':') // Remove spaces around colons
-      .replace(/\s*;\s*/g, ';') // Remove spaces around semicolons
-      .replace(/\s*,\s*/g, ',') // Remove spaces around commas
-      .trim(); // Remove leading/trailing whitespace
-  }
+  private getCachedClassCSS(className: string): string {
+    if (this.cssCache.has(className)) {
+      return this.cssCache.get(className)!;
+    }
 
-  private generateBaseStyles(): string {
-    const config = vscode.workspace.getConfiguration('core4');
-    const fontFamily = config.get<string>('fontFamily', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif');
-
-    return `
-/* Core4 Base Styles */
-* {
-  font-family: ${fontFamily};
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-}
-`;
-  }
-
-  private generateElementStyles(): string {
-    const config = vscode.workspace.getConfiguration('core4');
-    const primaryColor = config.get<string>('primaryColor', '#008001');
-    const secondaryColor = config.get<string>('secondaryColor', '#005500');
-    const borderRadius = config.get<string>('borderRadius', '0.35em');
-
-    return `
-/* Form elements and buttons */
-input, select, textarea {
-  padding: 0.6em 1.2em;
-  border: 1px solid #ddd;
-  border-radius: ${borderRadius};
-  font-size: inherit;
-  font-family: inherit;
-}
-
-button, .button {
-  padding: 0.6em 1.2em;
-  border: none;
-  border-radius: ${borderRadius};
-  background: ${primaryColor};
-  color: white;
-  cursor: pointer;
-  font-size: inherit;
-  font-family: inherit;
-}
-
-button:hover, .button:hover {
-  background: ${secondaryColor};
-}
-
-/* Links */
-a {
-  text-decoration: none;
-  color: #0e0e0e;
-}
-`;
+    const css = this.generateClassCSS(className);
+    this.cssCache.set(className, css);
+    return css;
   }
 
   private generateClassCSS(className: string): string {
-    // Layout classes
+    // Layout classes (including responsive)
     if (className.startsWith('layout-')) {
       return this.generateLayoutCSS(className);
+    }
+
+    // Width classes
+    if (className.startsWith('w-')) {
+      return this.generateWidthCSS(className);
+    }
+
+    // Height classes
+    if (className.startsWith('h-')) {
+      return this.generateHeightCSS(className);
+    }
+
+    // Space classes
+    if (className.startsWith('space-')) {
+      return this.generateSpaceCSS(className);
+    }
+
+    // Flexbox classes
+    if (this.isFlexboxClass(className)) {
+      return this.generateFlexboxCSS(className);
+    }
+
+    // Text utility classes
+    if (this.isTextUtilityClass(className)) {
+      return this.generateTextUtilityCSS(className);
+    }
+
+    // Border and rounded classes
+    if (className.startsWith('border') || className.startsWith('rounded')) {
+      return this.generateBorderCSS(className);
+    }
+
+    // Overflow classes
+    if (className.startsWith('overflow-')) {
+      return this.generateOverflowCSS(className);
+    }
+
+    // Text size classes (alternative to fs-)
+    if (className.startsWith('text-') && this.isTextSizeClass(className)) {
+      return this.generateTextSizeCSS(className);
     }
 
     // Spacing classes (margin/padding)
@@ -190,29 +190,8 @@ a {
     }
 
     // Color classes
-    const config = vscode.workspace.getConfiguration('core4');
-    const primaryColor = config.get<string>('primaryColor', '#008001');
-    const secondaryColor = config.get<string>('secondaryColor', '#005500');
-    const highlightColor = config.get<string>('highlightColor', '#ff6b35');
-
-    // Use config values for brand colors, fallback to predefined for semantic colors
-    const colorMap: Record<string, string> = {
-      primary: primaryColor,
-      secondary: secondaryColor,
-      highlight: highlightColor,
-      danger: '#dc3545',
-      success: '#28a745',
-      warning: '#ffc107',
-      info: '#17a2b8',
-      black: '#000000',
-      white: '#ffffff',
-      'grey-lightest': '#f8f9fa',
-      'grey-darkest': '#343a40',
-      'trans-grey': 'rgba(0,0,0,0.1)',
-      'trans-black': 'rgba(0,0,0,0.8)',
-      'dark-violet': '#4a148c',
-      'light-violet': '#e1bee7'
-    };
+    const config = this.getConfig();
+    const colorMap = this.getColorMap(config);
 
     if (className in colorMap) {
       return `.${className} { color: ${colorMap[className]}; }\n`;
@@ -250,6 +229,202 @@ a {
     }
 
     // Utility classes
+    return this.generateUtilityCSS(className);
+  }
+
+  // NEW UTILITY METHODS
+
+  private generateWidthCSS(className: string): string {
+    const widthMap: Record<string, string> = {
+      'w-full': '100%',
+      'w-1/2': '50%',
+      'w-1/3': '33.333333%',
+      'w-2/3': '66.666667%',
+      'w-1/4': '25%',
+      'w-3/4': '75%',
+      'w-screen': '100vw'
+    };
+
+    if (className in widthMap) {
+      return `.${className} { width: ${widthMap[className]}; }\n`;
+    }
+    return '';
+  }
+
+  private generateHeightCSS(className: string): string {
+    if (className === 'h-screen') {
+      return `.${className} { height: 100vh; }\n`;
+    }
+    if (className === 'h-full') {
+      return `.${className} { height: 100%; }\n`;
+    }
+    if (className === 'h-auto') {
+      return `.${className} { height: auto; }\n`;
+    }
+
+    // Handle numeric heights like h-64
+    const match = className.match(/h-(\d+)/);
+    if (match) {
+      const value = parseInt(match[1]) * 0.25; // 0.25rem per unit
+      return `.${className} { height: ${value}rem; }\n`;
+    }
+
+    return '';
+  }
+
+  private generateSpaceCSS(className: string): string {
+    const match = className.match(/space-(x|y)-([1-8])/);
+    if (!match) return '';
+
+    const direction = match[1];
+    const size = match[2];
+    const spacing = this.spacingValues[size];
+
+    if (!spacing) return '';
+
+    if (direction === 'x') {
+      return `.${className} > * + * { margin-left: ${spacing}; }\n`;
+    } else {
+      return `.${className} > * + * { margin-top: ${spacing}; }\n`;
+    }
+  }
+
+  private isFlexboxClass(className: string): boolean {
+    const flexClasses = [
+      'flex', 'flex-col', 'flex-row', 'flex-wrap', 'flex-nowrap',
+      'items-start', 'items-center', 'items-end', 'items-stretch',
+      'justify-start', 'justify-center', 'justify-between', 'justify-around', 'justify-evenly'
+    ];
+    return flexClasses.includes(className);
+  }
+
+  private generateFlexboxCSS(className: string): string {
+    const flexMap: Record<string, string> = {
+      'flex': 'display: flex',
+      'flex-col': 'display: flex; flex-direction: column',
+      'flex-row': 'display: flex; flex-direction: row',
+      'flex-wrap': 'flex-wrap: wrap',
+      'flex-nowrap': 'flex-wrap: nowrap',
+      'items-start': 'align-items: flex-start',
+      'items-center': 'align-items: center',
+      'items-end': 'align-items: flex-end',
+      'items-stretch': 'align-items: stretch',
+      'justify-start': 'justify-content: flex-start',
+      'justify-center': 'justify-content: center',
+      'justify-between': 'justify-content: space-between',
+      'justify-around': 'justify-content: space-around',
+      'justify-evenly': 'justify-content: space-evenly'
+    };
+
+    if (className in flexMap) {
+      return `.${className} { ${flexMap[className]}; }\n`;
+    }
+    return '';
+  }
+
+  private isTextUtilityClass(className: string): boolean {
+    const textUtils = ['uppercase', 'lowercase', 'capitalize', 'text-center', 'text-left', 'text-right'];
+    return textUtils.includes(className);
+  }
+
+  private generateTextUtilityCSS(className: string): string {
+    const textMap: Record<string, string> = {
+      'uppercase': 'text-transform: uppercase',
+      'lowercase': 'text-transform: lowercase',
+      'capitalize': 'text-transform: capitalize',
+      'text-center': 'text-align: center',
+      'text-left': 'text-align: left',
+      'text-right': 'text-align: right'
+    };
+
+    if (className in textMap) {
+      return `.${className} { ${textMap[className]}; }\n`;
+    }
+    return '';
+  }
+
+  private generateBorderCSS(className: string): string {
+    const config = this.getConfig();
+    const borderRadius = config.get<string>('borderRadius', '0.35em');
+
+    const borderMap: Record<string, string> = {
+      'border': 'border: 1px solid #e5e7eb',
+      'border-2': 'border: 2px solid #e5e7eb',
+      'border-t': 'border-top: 1px solid #e5e7eb',
+      'border-r': 'border-right: 1px solid #e5e7eb',
+      'border-b': 'border-bottom: 1px solid #e5e7eb',
+      'border-l': 'border-left: 1px solid #e5e7eb',
+      'rounded': `border-radius: ${borderRadius}`,
+      'rounded-sm': 'border-radius: 0.125rem',
+      'rounded-lg': 'border-radius: 0.5rem',
+      'rounded-full': 'border-radius: 9999px'
+    };
+
+    if (className in borderMap) {
+      return `.${className} { ${borderMap[className]}; }\n`;
+    }
+    return '';
+  }
+
+  private generateOverflowCSS(className: string): string {
+    const overflowMap: Record<string, string> = {
+      'overflow-hidden': 'overflow: hidden',
+      'overflow-auto': 'overflow: auto',
+      'overflow-scroll': 'overflow: scroll',
+      'overflow-visible': 'overflow: visible'
+    };
+
+    if (className in overflowMap) {
+      return `.${className} { ${overflowMap[className]}; }\n`;
+    }
+    return '';
+  }
+
+  private isTextSizeClass(className: string): boolean {
+    const textSizes = ['text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl'];
+    return textSizes.includes(className);
+  }
+
+  private generateTextSizeCSS(className: string): string {
+    const textSizeMap: Record<string, string> = {
+      'text-xs': '0.75rem',
+      'text-sm': '0.875rem',
+      'text-base': '1rem',
+      'text-lg': '1.125rem',
+      'text-xl': '1.25rem',
+      'text-2xl': '1.5rem',
+      'text-3xl': '1.875rem'
+    };
+
+    const size = textSizeMap[className];
+    if (size) {
+      return `.${className} { font-size: ${size}; }\n`;
+    }
+    return '';
+  }
+
+  private getColorMap(config: vscode.WorkspaceConfiguration): Record<string, string> {
+    return {
+      primary: config.get<string>('primaryColor', '#008001'),
+      secondary: config.get<string>('secondaryColor', '#005500'),
+      highlight: config.get<string>('highlightColor', '#ff6b35'),
+      danger: '#dc3545',
+      success: '#10b981',
+      warning: '#f59e0b',
+      info: '#3b82f6',
+      black: '#000000',
+      white: '#ffffff',
+      'grey-lightest': '#f8f9fa',
+      'grey-darkest': '#343a40',
+      'trans-grey': 'rgba(0,0,0,0.1)',
+      'trans-black': 'rgba(0,0,0,0.8)',
+      'dark-violet': '#4a148c',
+      'light-violet': '#e1bee7'
+    };
+  }
+
+  private generateUtilityCSS(className: string): string {
+    const config = this.getConfig();
     const borderRadius = config.get<string>('borderRadius', '0.35em');
     const shadowColor = config.get<string>('shadowColor', 'rgba(0,0,0,0.1)');
 
@@ -281,8 +456,25 @@ a {
     return '';
   }
 
+  // LAYOUT CSS GENERATION (with responsive support)
   private generateLayoutCSS(className: string): string {
-    // Extract the layout pattern (e.g., "123-456" from "layout-123-456")
+    // Check for responsive layout first
+    const responsiveMatch = className.match(/layout-([a-z]{2})-(.+)/);
+    if (responsiveMatch) {
+      const breakpoint = responsiveMatch[1];
+      const pattern = responsiveMatch[2];
+
+      if (breakpoint in this.breakpoints) {
+        const baseCSS = this.generateLayoutCSSInternal(`layout-${pattern}`);
+        // Wrap in media query
+        return `@media (min-width: ${this.breakpoints[breakpoint]}) {\n${baseCSS.replace(/\n/g, '\n  ')}\n}\n`;
+      }
+    }
+
+    return this.generateLayoutCSSInternal(className);
+  }
+
+  private generateLayoutCSSInternal(className: string): string {
     const pattern = className.replace('layout-', '');
     const rows = pattern.split('-');
 
@@ -291,14 +483,12 @@ a {
     const numCols = rows[0].length;
     const numRows = rows.length;
 
-    // Helper function to get character value (0-9 = 0-9, a-z = 10-35)
     const getCharValue = (char: string): number => {
       if (char >= '0' && char <= '9') return parseInt(char);
       if (char >= 'a' && char <= 'z') return 10 + (char.charCodeAt(0) - 'a'.charCodeAt(0));
-      return -1; // Invalid character
+      return -1;
     };
 
-    // Parse the grid to find element positions and spans
     const elementPositions = new Map<number, {
       minRow: number;
       maxRow: number;
@@ -310,7 +500,7 @@ a {
     rows.forEach((row, rowIndex) => {
       [...row].forEach((char, colIndex) => {
         const value = getCharValue(char);
-        if (value === -1) return; // Skip invalid characters
+        if (value === -1) return;
 
         if (!elementPositions.has(value)) {
           elementPositions.set(value, {
@@ -330,7 +520,6 @@ a {
       });
     });
 
-    // Sort elements by order of first appearance to assign nth-child indices
     const sortedElements = Array.from(elementPositions.entries())
       .sort(([a, posA], [b, posB]) => {
         const rowDiff = posA.firstAppearance.row - posB.firstAppearance.row;
@@ -338,23 +527,19 @@ a {
         return posA.firstAppearance.col - posB.firstAppearance.col;
       });
 
-    // Generate compact CSS
     let css = `.${className} {\n`;
     css += `  display: grid;\n`;
     css += `  grid: repeat(${numRows}, 1fr) / repeat(${numCols}, 1fr);\n`;
     css += `}\n\n`;
 
-    // Only generate rules for elements that need explicit positioning
     sortedElements.forEach(([value, pos], index) => {
       const childIndex = index + 1;
       const spans = pos.minRow !== pos.maxRow || pos.minCol !== pos.maxCol;
 
-      // Calculate what the "natural" position would be for this child index
       const naturalRow = Math.floor((childIndex - 1) / numCols) + 1;
       const naturalCol = ((childIndex - 1) % numCols) + 1;
       const isInNaturalPosition = pos.minRow === naturalRow && pos.minCol === naturalCol && !spans;
 
-      // Only add rule if element spans multiple cells or is out of natural order
       if (spans || !isInNaturalPosition) {
         css += `.${className} > *:nth-child(${childIndex}) {\n`;
         css += `  grid-area: ${pos.minRow} / ${pos.minCol} / ${pos.maxRow + 1} / ${pos.maxCol + 1};\n`;
@@ -365,6 +550,76 @@ a {
     return css;
   }
 
+  // EXISTING METHODS (unchanged)
+  private minifyCSS(css: string): string {
+    return css
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\s+/g, ' ')
+      .replace(/\s*{\s*/g, '{')
+      .replace(/\s*}\s*/g, '}')
+      .replace(/\s*:\s*/g, ':')
+      .replace(/\s*;\s*/g, ';')
+      .replace(/\s*,\s*/g, ',')
+      .trim();
+  }
+
+  private generateBaseStyles(): string {
+    const config = this.getConfig();
+    const fontFamily = config.get<string>('fontFamily', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif');
+
+    return `
+/* Core4 Base Styles */
+* {
+  font-family: ${fontFamily};
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+`;
+  }
+
+  private generateElementStyles(): string {
+    const config = this.getConfig();
+    const primaryColor = config.get<string>('primaryColor', '#008001');
+    const secondaryColor = config.get<string>('secondaryColor', '#005500');
+    const borderRadius = config.get<string>('borderRadius', '0.35em');
+
+    return `
+/* Form elements and buttons */
+input, select, textarea {
+  padding: 0.6em 1.2em;
+  border: 1px solid #ddd;
+  border-radius: ${borderRadius};
+  font-size: inherit;
+  font-family: inherit;
+}
+
+button, .button {
+  padding: 0.6em 1.2em;
+  border: none;
+  border-radius: ${borderRadius};
+  background: ${primaryColor};
+  color: white;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+button:hover, .button:hover {
+  background: ${secondaryColor};
+}
+
+/* Links */
+a {
+  text-decoration: none;
+  color: #0e0e0e;
+}
+`;
+  }
+
   private generateSpacingCSS(className: string): string {
     const parts = className.split('-');
     const property = parts[0] === 'm' ? 'margin' : 'padding';
@@ -373,9 +628,8 @@ a {
     if (size in this.spacingValues) {
       let css = `.${className} { ${property}: ${this.spacingValues[size]} !important; }\n`;
 
-      // Handle directional variants (mx, my, px, py)
       if (parts.length === 2 && (className.startsWith('mx-') || className.startsWith('my-') || className.startsWith('px-') || className.startsWith('py-'))) {
-        const direction = parts[0].substring(1); // 'x' or 'y'
+        const direction = parts[0].substring(1);
         const dirProperty = direction === 'x' ? `${property}-left, ${property}-right` : `${property}-top, ${property}-bottom`;
         css = `.${className} { ${dirProperty}: ${this.spacingValues[size]} !important; }\n`;
       }
@@ -411,7 +665,7 @@ a {
 
   private generateResponsiveDisplayCSS(className: string): string {
     const parts = className.split('-');
-    const action = parts[0]; // 'show' or 'hide'
+    const action = parts[0];
     const breakpoint = parts[1];
 
     if (breakpoint in this.breakpoints) {
@@ -444,7 +698,7 @@ a {
     const gapMultipliers: Record<string, number> = {
       'xs': 0.375,
       'sm': 0.75,
-      'md': 1, // Default gap size
+      'md': 1,
       'lg': 1.5,
       'xl': 3,
       '2xl': 4.5,
