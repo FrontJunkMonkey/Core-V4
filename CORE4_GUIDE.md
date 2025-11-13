@@ -151,12 +151,98 @@ This gives you **precise control** without memorizing grid syntax.
 ```
 
 ### Interactive Elements
+
+#### Slider/Carousel
 ```html
-<div class="slider">       <!-- Carousel/slider functionality -->
-<div class="items">        <!-- Grid of items -->
-<div class="list">         <!-- List of things -->
-<div class="expand">       <!-- Expandable content -->
-<div class="popup">        <!-- Popup/overlay -->
+<div class="slider">                    <!-- Basic auto-sliding carousel -->
+<div class="slider slider-dots">       <!-- Carousel with dot navigation -->
+<div class="slider slider-bar">        <!-- Carousel with progress bar -->
+<div class="slider slider-sd-off">     <!-- Disable on small desktop+ -->
+```
+
+#### Image Gallery with Zoom
+```html
+<div class="zoomee">                    <!-- Image gallery with zoom capability -->
+  <img src="image1.jpg" alt="Image 1">
+  <img src="image2.jpg" alt="Image 2">
+  <img src="image3.jpg" alt="Image 3">
+</div>
+```
+
+#### Text Truncation with Read More
+```html
+<div class="readMore max-lines-3">     <!-- Show 3 lines with read more button -->
+  <p>Long text content that will be truncated...</p>
+</div>
+```
+
+#### Interactive Borders
+```html
+<div class="hover-border">             <!-- Border appears on hover/focus -->
+  Content with interactive border
+</div>
+```
+
+### Advanced Layout & Alignment
+
+#### Container Variations
+```html
+<div class="container">                <!-- Max-width: 1550px -->
+<div class="container-sm">             <!-- Max-width: 1395px -->
+<div class="container-lg">             <!-- Max-width: 1782.5px -->
+```
+
+#### Gap System
+```html
+<div class="gap">                      <!-- Default gap -->
+<div class="gap-xs">                   <!-- Extra small gap -->
+<div class="gap-sm">                   <!-- Small gap -->
+<div class="gap-lg">                   <!-- Large gap -->
+<div class="gap-xl">                   <!-- Extra large gap -->
+<div class="gap-2xl">                  <!-- 2x extra large gap -->
+<div class="gap-3xl">                  <!-- 3x extra large gap -->
+<div class="gap-sm-lg">                <!-- Large gap on small screens+ -->
+```
+
+#### Alignment System
+```html
+<div class="align-tl">                 <!-- Top-left alignment -->
+<div class="align-tc">                 <!-- Top-center alignment -->
+<div class="align-tr">                 <!-- Top-right alignment -->
+<div class="align-ml">                 <!-- Middle-left alignment -->
+<div class="align-mc">                 <!-- Middle-center alignment -->
+<div class="align-mr">                 <!-- Middle-right alignment -->
+<div class="align-bl">                 <!-- Bottom-left alignment -->
+<div class="align-bc">                 <!-- Bottom-center alignment -->
+<div class="align-br">                 <!-- Bottom-right alignment -->
+<div class="align-sm-mc">              <!-- Middle-center on small screens+ -->
+```
+
+#### Text Line Clamping
+```html
+<p class="max-lines-1">                <!-- Clamp to 1 line -->
+<p class="max-lines-3">                <!-- Clamp to 3 lines -->
+<p class="max-lines-5">                <!-- Clamp to 5 lines -->
+<!-- Available: max-lines-1 through max-lines-15 -->
+```
+
+### Enhanced Visual Effects
+```html
+<div class="radius">                   <!-- border-radius: 0.35em -->
+<div class="radius-sm">                <!-- border-radius: 4px -->
+<div class="radius-lg">                <!-- border-radius: 0.7em -->
+<div class="radius-xl">                <!-- border-radius: 40px -->
+<div class="box-shadow">               <!-- 20px 20px 30px rgba(0,0,0,0.3) -->
+<div class="overflow-hidden">          <!-- overflow: hidden -->
+```
+
+### Development Helper
+```html
+<div class="setup">                    <!-- Colored backgrounds for layout debugging -->
+  <div>Child 1 - Blue background</div>
+  <div>Child 2 - Green background</div>
+  <div>Child 3 - Yellow background</div>
+</div>
 ```
 
 ## Breakpoints
@@ -170,20 +256,97 @@ This gives you **precise control** without memorizing grid syntax.
 - `md`: 1191px (Medium desktop)
 - `ld`: 1500px (Large desktop)
 
+## JavaScript Components
+
+Core4 includes several JavaScript components that activate automatically:
+
+### Auto-Slider
+```html
+<!-- Basic auto-rotating carousel -->
+<div class="slider">
+  <div>Slide 1</div>
+  <div>Slide 2</div>
+  <div>Slide 3</div>
+</div>
+
+<!-- With dot navigation -->
+<div class="slider slider-dots">
+  <div>Slide 1</div>
+  <div>Slide 2</div>
+</div>
+
+<!-- With progress bar -->
+<div class="slider slider-bar">
+  <div>Slide 1</div>
+  <div>Slide 2</div>
+</div>
+```
+
+### Zoomee Image Gallery
+```html
+<!-- Automatic image gallery with zoom -->
+<div class="zoomee">
+  <img src="product1.jpg" alt="Product view 1">
+  <img src="product2.jpg" alt="Product view 2">
+  <img src="product3.jpg" alt="Product view 3">
+</div>
+```
+- Click any image to zoom
+- Navigate with arrow buttons or thumbnails  
+- Swipe support on mobile
+- Keyboard navigation (ESC to close)
+
+### Read More Text Truncation
+```html
+<!-- Text that auto-truncates with expand button -->
+<div class="readMore max-lines-3">
+  <p>Very long text content that will be automatically truncated to 3 lines and show a "Read more" button when it overflows...</p>
+</div>
+```
+
+To include JavaScript functionality:
+```html
+<script src="assets/scripts/async.js"></script>
+<script src="assets/scripts/core-slider.js"></script>
+<script src="assets/scripts/zoomee.js"></script>
+```
+
 ## Usage Example
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="core4.css">
+    <link rel="stylesheet" href="assets/styles/core.css">
 </head>
 <body>
     <div class="container">
         <h1 class="fs-3xl center">Hello Core4</h1>
-        <div class="layout-12-34 m-2">
-            <p class="fs-md">This is a responsive layout</p>
+        
+        <!-- Image Gallery -->
+        <div class="zoomee m-2">
+            <img src="image1.jpg" alt="Gallery Image 1">
+            <img src="image2.jpg" alt="Gallery Image 2">
+        </div>
+        
+        <!-- Auto Slider -->
+        <div class="slider slider-dots m-2">
+            <div class="p-3 bg-primary white center">Slide 1</div>
+            <div class="p-3 bg-secondary white center">Slide 2</div>
+            <div class="p-3 bg-highlight white center">Slide 3</div>
+        </div>
+        
+        <!-- Responsive Layout -->
+        <div class="layout-12-34 gap m-2">
+            <div class="readMore max-lines-2">
+                <p>This is a responsive layout with automatic text truncation functionality...</p>
+            </div>
+            <button class="hover-border">Interactive Button</button>
         </div>
     </div>
+    
+    <script src="assets/scripts/async.js"></script>
+    <script src="assets/scripts/core-slider.js"></script>
+    <script src="assets/scripts/zoomee.js"></script>
 </body>
 </html>
 ``` 

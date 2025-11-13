@@ -1,33 +1,57 @@
 # Core4 Extension
 
-A Cursor/VSCode extension that automatically generates optimized CSS for the Core4 framework based on classes used in your HTML files.
+🚀 A powerful VS Code extension that automatically generates optimized CSS for the Core4 framework based on classes used in your HTML files.
 
-## Features
+## ✨ Features
 
-- **Automatic CSS Generation**: Watches your HTML files and generates only the CSS you actually use
-- **System Fonts**: Uses modern system fonts for a professional look out of the box
-- **Layout-First Design**: Focuses on your unique layout system with explicit child-to-row mapping
-- **Complete System**: Includes spacing, typography, colors, and essential styling
-- **Tiny CSS Files**: Only generates CSS for classes you actually use
-- **Status Bar Control**: Simple button to enable/disable watching per project
+- **🔄 Automatic CSS Generation**: Real-time watching and generation of only the CSS you actually use
+- **⚙️ Visual Settings Panel**: Beautiful UI for configuring colors, fonts, and options with live previews
+- **🎨 Color Customization**: Built-in color pickers for primary, secondary, and highlight colors
+- **📱 Responsive Layout System**: Core4's unique explicit child-to-row mapping with 9 breakpoints
+- **📊 Statistics Dashboard**: Track classes found, file sizes, and generation metrics
+- **⚡ Tiny CSS Files**: Only generates CSS for detected classes - no bloat
+- **🎯 Command Palette Integration**: Full VS Code command support for all features
+- **📝 Modern Typography**: System font stacks with customizable options
 
-## Installation
+## 🚀 Quick Start
 
-### For Testing (Local Installation)
+### Installation
 
-1. **Download the VSIX file**: The extension is packaged as `core4-extension-0.1.0.vsix`
+1. **From VS Code Marketplace** (Coming Soon):
+   - Search "Core4 CSS Framework" in Extensions
+   - Click Install
 
-2. **Install in Cursor/VSCode**:
-   - Open Cursor/VSCode
-   - Go to Extensions (Ctrl+Shift+X)
-   - Click the "..." menu in the Extensions panel
-   - Select "Install from VSIX..."
-   - Choose the `core4-extension-0.1.0.vsix` file
+2. **From VSIX** (Current):
+   - Download the latest `.vsix` file
+   - Open VS Code → Extensions → "..." → "Install from VSIX..."
+   - Select the downloaded file
 
-3. **Activate the Extension**:
-   - Open a project folder in Cursor/VSCode
-   - Look for the "Core4" button in the status bar (bottom-right)
-   - Click it to enable CSS generation for your project
+### First Steps
+
+1. **Open a project** in VS Code with HTML/template files
+2. **Click the "Core4" button** in the status bar (bottom-right)
+3. **Start using Core4 classes** in your HTML:
+   ```html
+   <div class="layout-12-34 gap align-mc">
+     <div>Item 1</div>
+     <div>Item 2</div>
+     <div>Item 3</div>
+     <div>Item 4</div>
+   </div>
+   ```
+4. **CSS is generated automatically** at `./styles/core4.css`
+
+## 🎛️ Commands
+
+Access via Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
+
+| Command | Description |
+|---------|-------------|
+| `Core4: Open Settings` | Visual settings panel with color pickers and font selection |
+| `Core4: Generate CSS` | Manually trigger CSS generation |
+| `Core4: Toggle File Watching` | Start/stop automatic file watching |
+| `Core4: Open CSS Output File` | Open the generated CSS file |
+| `Core4: Show Statistics` | View project statistics and metrics |
 
 ## How It Works
 
@@ -175,49 +199,97 @@ To open settings: Use the "Core4: Open Settings" command or go to Settings > Ext
 - Haml files (`.haml`)
 - Slim files (`.slim`)
 
-## Output
+## 🎨 Settings Panel
 
-The extension generates a `core4.css` file in your `styles/` folder containing:
+Access the visual settings panel via `Core4: Open Settings`:
 
-1. **Base styles** (always included)
-2. **Element styles** (always included)
-3. **Class styles** (only for classes you actually use)
+- **🎨 Color Pickers**: Visual color selection for primary, secondary, and highlight colors
+- **📝 Font Selector**: Choose from popular font stacks with previews
+- **⚙️ Generation Options**: Configure output path, minification, and default styles
+- **🔄 One-Click Actions**: Generate CSS and reset to defaults
+- **💾 Auto-Save**: Settings are saved automatically to workspace
 
-## Example Output
+## 📊 What Gets Generated
 
-```css
-/* Core4 Base Styles */
-* {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
-               "Helvetica Neue", Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  box-sizing: border-box;
+The extension scans your files and generates a `core4.css` file containing:
+
+1. **📦 Base Styles**: Core4's foundational CSS (when enabled)
+2. **🎯 Used Classes Only**: Only CSS for classes actually found in your files
+3. **📱 Responsive Variants**: Breakpoint-specific classes you're using
+4. **🎨 Custom Colors**: Your configured color scheme applied
+
+## 🏗️ Core4 Framework Overview
+
+### Layout System
+- **Explicit Child-to-Row Mapping**: `layout-123-456` means children 1,2,3 in row 1, children 4,5,6 in row 2
+- **9 Responsive Breakpoints**: `sm` (320px) through `ld` (1500px)
+- **Alignment Classes**: 9-point grid system (`align-tl`, `align-mc`, `align-br`, etc.)
+
+### Utility Classes
+- **Spacing**: `m-*`, `p-*`, `mx-*`, `my-*` with responsive variants
+- **Typography**: `fs-*` (font-size), `fw-*` (font-weight), alignment classes
+- **Colors**: Semantic colors (`primary`, `secondary`, `highlight`) + utility colors
+- **Layout Utilities**: `gap-*`, `max-lines-*`, `container-*`, display controls
+
+### JavaScript Components
+- **Text Truncation**: `readMore` functionality with "show more/less"
+- **Image Galleries**: `zoomee` with lightbox and zoom capabilities  
+- **Auto Sliders**: Rotating carousels with dots and progress bars
+
+## 🚀 Performance Benefits
+
+- **🏃‍♂️ Tiny CSS Files**: Only generates CSS for classes you actually use
+- **⚡ Fast Loading**: No unused CSS means faster page loads
+- **📊 Size Tracking**: Built-in statistics show file sizes and class counts
+- **🔄 Real-time Updates**: CSS regenerates automatically when you add/remove classes
+
+## ⚙️ Configuration
+
+All settings are configurable via the Settings Panel or VS Code settings:
+
+```json
+{
+  "core4.enabled": true,
+  "core4.outputPath": "./styles/core4.css",
+  "core4.minify": true,
+  "core4.primaryColor": "#008001",
+  "core4.secondaryColor": "#005500",
+  "core4.highlightColor": "#ff6b35"
 }
+```
 
-/* Form elements and buttons */
-input, select, textarea {
-  padding: 0.6em 1.2em;
-  border: 1px solid #ddd;
-  border-radius: 0.35em;
-  font-size: inherit;
-  font-family: inherit;
-}
+## 🛠️ Development
 
-button, .button {
-  padding: 0.6em 1.2em;
-  border: none;
-  border-radius: 0.35em;
-  background: #008001;
-  color: white;
-  cursor: pointer;
-  font-size: inherit;
-  font-family: inherit;
-}
+Want to contribute or modify the extension?
 
-/* Your used classes */
-.layout-123-456 {
-  display: grid;
+```bash
+# Clone the repository
+git clone https://github.com/FrontJunkMonkey/Core-V4.git
+cd Core-V4/Core4Ext
+
+# Install dependencies
+npm install
+
+# Compile TypeScript
+npm run compile
+
+# Watch for changes
+npm run watch
+```
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions welcome! Please read our contributing guidelines and submit pull requests to the [Core-V4 repository](https://github.com/FrontJunkMonkey/Core-V4).
+
+## 📞 Support
+
+- 🐛 [Report Issues](https://github.com/FrontJunkMonkey/Core-V4/issues)
+- 📖 [Documentation](https://github.com/FrontJunkMonkey/Core-V4#readme)
+- 💬 [Discussions](https://github.com/FrontJunkMonkey/Core-V4/discussions)
   grid-template-rows: repeat(2, 1fr);
   grid-template-areas:
     "child-1 child-2 child-3"

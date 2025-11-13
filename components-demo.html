@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core4 Framework - Component Demo</title>
+    <link rel="stylesheet" href="assets/styles/core.css">
+    <link rel="stylesheet" href="assets/styles/zoomee.css">
+    <style>
+        .demo-section {
+            border: 2px solid #ddd;
+            margin: 2em 0;
+            border-radius: 0.5em;
+            overflow: hidden;
+        }
+        .demo-header {
+            background: #f8f9fa;
+            padding: 1em;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+        }
+        .demo-content {
+            padding: 1.5em;
+        }
+        .demo-code {
+            background: #f1f3f4;
+            padding: 1em;
+            border-top: 1px solid #ddd;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #333;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="center m-3">
+            <h1 class="fs-5xl primary">Core4 Framework</h1>
+            <p class="fs-lg">Live Component Demonstrations</p>
+        </header>
+
+        <!-- Layout System -->
+        <section class="demo-section">
+            <div class="demo-header">Layout System - Explicit Child Mapping</div>
+            <div class="demo-content">
+                <h3>layout-12-34 (2x2 Grid)</h3>
+                <div class="layout-12-34 gap setup" style="height: 200px;">
+                    <div class="p-2 center">Child 1</div>
+                    <div class="p-2 center">Child 2</div>
+                    <div class="p-2 center">Child 3</div>
+                    <div class="p-2 center">Child 4</div>
+                </div>
+            </div>
+            <div class="demo-code">&lt;div class="layout-12-34 gap"&gt;
+    &lt;div&gt;Child 1&lt;/div&gt;
+    &lt;div&gt;Child 2&lt;/div&gt;
+    &lt;div&gt;Child 3&lt;/div&gt;
+    &lt;div&gt;Child 4&lt;/div&gt;
+&lt;/div&gt;</div>
+        </section>
+
+        <!-- Slider Component -->
+        <section class="demo-section">
+            <div class="demo-header">Auto Slider with Dots</div>
+            <div class="demo-content">
+                <div class="slider slider-dots" style="height: 200px;">
+                    <div class="bg-primary white p-3 center">
+                        <h3>Slide 1</h3>
+                        <p>Auto-rotating carousel with dot navigation</p>
+                    </div>
+                    <div class="bg-secondary white p-3 center">
+                        <h3>Slide 2</h3>
+                        <p>Smooth transitions and responsive</p>
+                    </div>
+                    <div class="bg-highlight white p-3 center">
+                        <h3>Slide 3</h3>
+                        <p>Easy to implement and customize</p>
+                    </div>
+                </div>
+            </div>
+            <div class="demo-code">&lt;div class="slider slider-dots"&gt;
+    &lt;div&gt;Slide 1&lt;/div&gt;
+    &lt;div&gt;Slide 2&lt;/div&gt;
+    &lt;div&gt;Slide 3&lt;/div&gt;
+&lt;/div&gt;</div>
+        </section>
+
+        <!-- Zoomee Gallery -->
+        <section class="demo-section">
+            <div class="demo-header">Zoomee Image Gallery</div>
+            <div class="demo-content">
+                <div class="zoomee" style="max-width: 400px; margin: 0 auto;">
+                    <img src="https://picsum.photos/400/300?random=1" alt="Gallery Image 1">
+                    <img src="https://picsum.photos/400/300?random=2" alt="Gallery Image 2">
+                    <img src="https://picsum.photos/400/300?random=3" alt="Gallery Image 3">
+                </div>
+            </div>
+            <div class="demo-code">&lt;div class="zoomee"&gt;
+    &lt;img src="image1.jpg" alt="Gallery Image 1"&gt;
+    &lt;img src="image2.jpg" alt="Gallery Image 2"&gt;
+    &lt;img src="image3.jpg" alt="Gallery Image 3"&gt;
+&lt;/div&gt;</div>
+        </section>
+
+        <!-- ReadMore Text Truncation -->
+        <section class="demo-section">
+            <div class="demo-header">ReadMore Text Truncation</div>
+            <div class="demo-content">
+                <div class="readMore max-lines-3">
+                    <p>This is a long text that demonstrates the automatic text truncation feature. When text exceeds the specified number of lines, Core4 automatically adds a "Read more" button. This text is intentionally long to show how the truncation works. You can click the "Read more" button to expand the full text. This feature is perfect for product descriptions, blog previews, or any content where you want to show a preview but allow users to expand for more details. The truncation is responsive and works across all device sizes.</p>
+                </div>
+            </div>
+            <div class="demo-code">&lt;div class="readMore max-lines-3"&gt;
+    &lt;p&gt;Long text content...&lt;/p&gt;
+&lt;/div&gt;</div>
+        </section>
+
+        <!-- Interactive Elements -->
+        <section class="demo-section">
+            <div class="demo-header">Interactive Elements</div>
+            <div class="demo-content gap">
+                <div class="layout gap">
+                    <button class="hover-border">Hover Border Button</button>
+                    <button class="bg-secondary white">Secondary Button</button>
+                    <button class="bg-highlight white">Highlight Button</button>
+                </div>
+            </div>
+            <div class="demo-code">&lt;button class="hover-border"&gt;Hover Border Button&lt;/button&gt;
+&lt;button class="bg-secondary white"&gt;Secondary Button&lt;/button&gt;</div>
+        </section>
+
+        <!-- Typography & Spacing -->
+        <section class="demo-section">
+            <div class="demo-header">Typography & Responsive Sizing</div>
+            <div class="demo-content">
+                <h1 class="fs-3xl primary">Heading fs-3xl</h1>
+                <h2 class="fs-2xl secondary">Heading fs-2xl</h2>
+                <h3 class="fs-xl">Heading fs-xl</h3>
+                <p class="fs-lg">Large paragraph text (fs-lg)</p>
+                <p class="fs-md">Default paragraph text (fs-md)</p>
+                <p class="fs-sm">Small paragraph text (fs-sm)</p>
+            </div>
+            <div class="demo-code">&lt;h1 class="fs-3xl primary"&gt;Large Heading&lt;/h1&gt;
+&lt;p class="fs-lg"&gt;Large paragraph&lt;/p&gt;</div>
+        </section>
+
+        <!-- Alignment System -->
+        <section class="demo-section">
+            <div class="demo-header">Alignment System</div>
+            <div class="demo-content">
+                <div class="layout gap">
+                    <div class="setup align-tl p-2" style="height: 100px;">
+                        <div>Top Left</div>
+                    </div>
+                    <div class="setup align-mc p-2" style="height: 100px;">
+                        <div>Middle Center</div>
+                    </div>
+                    <div class="setup align-br p-2" style="height: 100px;">
+                        <div>Bottom Right</div>
+                    </div>
+                </div>
+            </div>
+            <div class="demo-code">&lt;div class="align-tl"&gt;Top Left&lt;/div&gt;
+&lt;div class="align-mc"&gt;Middle Center&lt;/div&gt;
+&lt;div class="align-br"&gt;Bottom Right&lt;/div&gt;</div>
+        </section>
+
+        <!-- Color System -->
+        <section class="demo-section">
+            <div class="demo-header">Color System</div>
+            <div class="demo-content">
+                <div class="layout gap">
+                    <div class="bg-primary white p-2 center radius">Primary</div>
+                    <div class="bg-secondary white p-2 center radius">Secondary</div>
+                    <div class="bg-highlight white p-2 center radius">Highlight</div>
+                    <div class="bg-danger white p-2 center radius">Danger</div>
+                    <div class="bg-black white p-2 center radius">Black</div>
+                </div>
+                <div class="layout gap mt-2">
+                    <span class="primary">Primary Text</span>
+                    <span class="secondary">Secondary Text</span>
+                    <span class="highlight">Highlight Text</span>
+                    <span class="danger">Danger Text</span>
+                </div>
+            </div>
+            <div class="demo-code">&lt;div class="bg-primary white"&gt;Primary Background&lt;/div&gt;
+&lt;span class="primary"&gt;Primary Text&lt;/span&gt;</div>
+        </section>
+
+        <!-- Visual Effects -->
+        <section class="demo-section">
+            <div class="demo-header">Visual Effects</div>
+            <div class="demo-content">
+                <div class="layout gap">
+                    <div class="bg-white p-3 radius">Default Radius</div>
+                    <div class="bg-white p-3 radius-sm">Small Radius</div>
+                    <div class="bg-white p-3 radius-lg">Large Radius</div>
+                    <div class="bg-white p-3 radius-xl">Extra Large Radius</div>
+                </div>
+                <div class="layout gap mt-2">
+                    <div class="bg-white p-3 box-shadow">Box Shadow</div>
+                    <div class="bg-white p-3 overflow-hidden" style="height: 60px;">
+                        <div style="height: 100px; background: linear-gradient(to bottom, #ff0000, #0000ff);">Overflow Hidden</div>
+                    </div>
+                </div>
+            </div>
+            <div class="demo-code">&lt;div class="radius"&gt;Default radius&lt;/div&gt;
+&lt;div class="box-shadow"&gt;Box shadow&lt;/div&gt;</div>
+        </section>
+
+        <!-- Container Variations -->
+        <section class="demo-section">
+            <div class="demo-header">Container Variations</div>
+            <div class="demo-content">
+                <div class="container-sm bg-grey-lightest p-2 center mb-2">Container Small (1395px max)</div>
+                <div class="container bg-grey-lightest p-2 center mb-2">Container Default (1550px max)</div>
+                <div class="container-lg bg-grey-lightest p-2 center">Container Large (1782.5px max)</div>
+            </div>
+            <div class="demo-code">&lt;div class="container-sm"&gt;Small container&lt;/div&gt;
+&lt;div class="container"&gt;Default container&lt;/div&gt;
+&lt;div class="container-lg"&gt;Large container&lt;/div&gt;</div>
+        </section>
+
+        <!-- Gap System -->
+        <section class="demo-section">
+            <div class="demo-header">Gap System</div>
+            <div class="demo-content">
+                <h4>Different Gap Sizes</h4>
+                <div class="layout gap-xs setup mb-2">
+                    <div class="p-1 center">Gap XS</div>
+                    <div class="p-1 center">Gap XS</div>
+                    <div class="p-1 center">Gap XS</div>
+                </div>
+                <div class="layout gap setup mb-2">
+                    <div class="p-1 center">Gap Default</div>
+                    <div class="p-1 center">Gap Default</div>
+                    <div class="p-1 center">Gap Default</div>
+                </div>
+                <div class="layout gap-xl setup">
+                    <div class="p-1 center">Gap XL</div>
+                    <div class="p-1 center">Gap XL</div>
+                    <div class="p-1 center">Gap XL</div>
+                </div>
+            </div>
+            <div class="demo-code">&lt;div class="layout gap-xs"&gt;Extra small gaps&lt;/div&gt;
+&lt;div class="layout gap"&gt;Default gaps&lt;/div&gt;
+&lt;div class="layout gap-xl"&gt;Extra large gaps&lt;/div&gt;</div>
+        </section>
+
+        <footer class="center m-4">
+            <p class="fs-sm grey-darkest">Core4 Framework - Comprehensive Component Demo</p>
+        </footer>
+    </div>
+
+    <script src="assets/scripts/async.js"></script>
+    <script src="assets/scripts/core-slider.js"></script>
+    <script src="assets/scripts/zoomee.js"></script>
+</body>
+</html>

@@ -1,34 +1,107 @@
 {
   "name": "core4-extension",
-  "displayName": "Core4 CSS Generator",
-  "description": "Generate optimized CSS from Core4 classes in your HTML",
-  "version": "0.1.0",
-  "publisher": "steveallday",
+  "displayName": "Core4 CSS Framework",
+  "description": "Automatically generates optimized CSS for the Core4 framework based on classes used in your HTML files",
+  "version": "0.2.0",
+  "publisher": "FrontJunkMonkey",
+  "author": {
+    "name": "FrontJunkMonkey"
+  },
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/core4/extension"
+    "url": "https://github.com/FrontJunkMonkey/Core-V4.git"
   },
+  "bugs": {
+    "url": "https://github.com/FrontJunkMonkey/Core-V4/issues"
+  },
+  "homepage": "https://github.com/FrontJunkMonkey/Core-V4#readme",
+  "keywords": [
+    "css",
+    "framework", 
+    "utility-first",
+    "core4",
+    "responsive",
+    "layout",
+    "generator",
+    "productivity"
+  ],
   "engines": {
     "vscode": "^1.74.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Formatters", 
+    "Snippets"
   ],
+  "galleryBanner": {
+    "color": "#008001",
+    "theme": "dark"
+  },
+  "icon": "assets/icon.png",
   "activationEvents": [
-    "onStartupFinished"
+    "onStartupFinished",
+    "onCommand:core4.generateCSS",
+    "onCommand:core4.openSettings"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "core4.generateCSS",
-        "title": "Generate Core4 CSS"
+        "title": "Generate CSS",
+        "category": "Core4",
+        "icon": "$(refresh)"
       },
       {
         "command": "core4.toggleWatching",
-        "title": "Toggle Core4 Watching"
+        "title": "Toggle File Watching",
+        "category": "Core4",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "core4.openSettings",
+        "title": "Open Settings",
+        "category": "Core4",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "core4.openOutput",
+        "title": "Open CSS Output File",
+        "category": "Core4",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "core4.showStats",
+        "title": "Show Statistics",
+        "category": "Core4",
+        "icon": "$(graph)"
       }
     ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "core4.generateCSS",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "core4.toggleWatching",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "core4.openSettings",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "core4.openOutput",
+          "when": "workspaceFolderCount > 0"
+        },
+        {
+          "command": "core4.showStats",
+          "when": "workspaceFolderCount > 0"
+        }
+      ]
+    },
     "configuration": {
       "title": "Core4 Extension",
       "properties": {
@@ -93,7 +166,10 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "devDependencies": {
     "@types/node": "16.x",

@@ -1,47 +1,67 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SettingsPanel = void 0;
-const vscode = require("vscode");
-class SettingsPanel {
-    static createOrShow(extensionUri) {
+import * as vscode from 'vscode';
+
+export class SettingsPanel {
+    public static currentPanel: SettingsPanel | undefined;
+    private readonly _panel: vscode.WebviewPanel;
+    private readonly _extensionUri: vscode.Uri;
+    private _disposables: vscode.Disposable[] = [];
+
+    public static createOrShow(extensionUri: vscode.Uri) {
         const column = vscode.window.activeTextEditor
             ? vscode.window.activeTextEditor.viewColumn
             : undefined;
+
         if (SettingsPanel.currentPanel) {
             SettingsPanel.currentPanel._panel.reveal(column);
             return;
         }
-        const panel = vscode.window.createWebviewPanel('core4Settings', 'Core4 Settings', column || vscode.ViewColumn.One, {
-            enableScripts: true,
-            localResourceRoots: [extensionUri]
-        });
+
+        const panel = vscode.window.createWebviewPanel(
+            'core4Settings',
+            'Core4 Settings',
+            column || vscode.ViewColumn.One,
+            {
+                enableScripts: true,
+                localResourceRoots: [extensionUri]
+            }
+        );
+
         SettingsPanel.currentPanel = new SettingsPanel(panel, extensionUri);
     }
-    constructor(panel, extensionUri) {
-        this._disposables = [];
+
+    private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
         this._panel = panel;
         this._extensionUri = extensionUri;
+
         this._update();
+
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
-        this._panel.webview.onDidReceiveMessage(message => {
-            switch (message.command) {
-                case 'updateSetting':
-                    this._updateSetting(message.key, message.value);
-                    return;
-                case 'resetToDefaults':
-                    this._resetToDefaults();
-                    return;
-                case 'generateCSS':
-                    vscode.commands.executeCommand('core4.generateCSS');
-                    return;
-            }
-        }, null, this._disposables);
+
+        this._panel.webview.onDidReceiveMessage(
+            message => {
+                switch (message.command) {
+                    case 'updateSetting':
+                        this._updateSetting(message.key, message.value);
+                        return;
+                    case 'resetToDefaults':
+                        this._resetToDefaults();
+                        return;
+                    case 'generateCSS':
+                        vscode.commands.executeCommand('core4.generateCSS');
+                        return;
+                }
+            },
+            null,
+            this._disposables
+        );
     }
-    _updateSetting(key, value) {
+
+    private _updateSetting(key: string, value: any) {
         const config = vscode.workspace.getConfiguration('core4');
         config.update(key, value, vscode.ConfigurationTarget.Workspace);
     }
-    _resetToDefaults() {
+
+    private _resetToDefaults() {
         const config = vscode.workspace.getConfiguration('core4');
         const defaults = {
             enabled: true,
@@ -56,18 +76,23 @@ class SettingsPanel {
             borderRadius: '0.35em',
             shadowColor: 'rgba(0,0,0,0.1)'
         };
+
         Object.keys(defaults).forEach(key => {
-            config.update(key, defaults[key], vscode.ConfigurationTarget.Workspace);
+            config.update(key, (defaults as any)[key], vscode.ConfigurationTarget.Workspace);
         });
+
         this._update();
         vscode.window.showInformationMessage('Core4 settings reset to defaults');
     }
-    _update() {
+
+    private _update() {
         const webview = this._panel.webview;
         this._panel.webview.html = this._getHtmlForWebview(webview);
     }
-    _getHtmlForWebview(webview) {
+
+    private _getHtmlForWebview(webview: vscode.Webview) {
         const config = vscode.workspace.getConfiguration('core4');
+        
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -333,9 +358,12 @@ class SettingsPanel {
 </body>
 </html>`;
     }
-    dispose() {
+
+    public dispose() {
         SettingsPanel.currentPanel = undefined;
+
         this._panel.dispose();
+
         while (this._disposables.length) {
             const x = this._disposables.pop();
             if (x) {
@@ -344,5 +372,3 @@ class SettingsPanel {
         }
     }
 }
-exports.SettingsPanel = SettingsPanel;
-//# sourceMappingURL=settingsPanel.js.map

@@ -5,6 +5,7 @@ const vscode = require("vscode");
 const classDetector_1 = require("./classDetector");
 const cssGenerator_1 = require("./cssGenerator");
 const fileWatcher_1 = require("./fileWatcher");
+const settingsPanel_1 = require("./settingsPanel");
 function activate(context) {
     console.log('Core4 Extension is now active!');
     const classDetector = new classDetector_1.ClassDetector();
@@ -52,6 +53,66 @@ function activate(context) {
     let generateCommand = vscode.commands.registerCommand('core4.generateCSS', () => {
         generateCSS();
     });
+    let openSettingsCommand = vscode.commands.registerCommand('core4.openSettings', () => {
+        settingsPanel_1.SettingsPanel.createOrShow(context.extensionUri);
+    });
+    let openOutputCommand = vscode.commands.registerCommand('core4.openOutput', async () => {
+        const config = vscode.workspace.getConfiguration('core4');
+        const outputPath = config.get('outputPath', './styles/core4.css');
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (workspaceFolders) {
+            const outputUri = vscode.Uri.joinPath(workspaceFolders[0].uri, outputPath);
+            try {
+                await vscode.window.showTextDocument(outputUri);
+            }
+            catch (error) {
+                vscode.window.showWarningMessage(`Output file not found: ${outputPath}. Generate CSS first.`);
+            }
+        }
+    });
+    let showStatsCommand = vscode.commands.registerCommand('core4.showStats', async () => {
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        if (!workspaceFolders) {
+            vscode.window.showErrorMessage('No workspace folder found');
+            return;
+        }
+        const detector = new classDetector_1.ClassDetector();
+        const files = await vscode.workspace.findFiles('**/*.{html,htm,php,vue,jsx,tsx,asp,aspx,cshtml,razor,erb,jsp,haml,slim,svelte,astro,liquid,twig,blade.php,mustache,hbs}');
+        let totalClasses = new Set();
+        let fileCount = 0;
+        for (const file of files) {
+            try {
+                const content = await vscode.workspace.fs.readFile(file);
+                const text = Buffer.from(content).toString('utf8');
+                const classes = detector.detectClasses(text);
+                if (classes.size > 0) {
+                    fileCount++;
+                    classes.forEach(cls => totalClasses.add(cls));
+                }
+            }
+            catch (error) {
+                // Skip files that can't be read
+            }
+        }
+        const config = vscode.workspace.getConfiguration('core4');
+        const outputPath = config.get('outputPath', './styles/core4.css');
+        let fileSize = 'Not generated';
+        try {
+            const outputUri = vscode.Uri.joinPath(workspaceFolders[0].uri, outputPath);
+            const stat = await vscode.workspace.fs.stat(outputUri);
+            fileSize = `${(stat.size / 1024).toFixed(1)} KB`;
+        }
+        catch (error) {
+            // File doesn't exist
+        }
+        const message = `📊 Core4 Statistics\n\n` +
+            `🎯 Classes Found: ${totalClasses.size}\n` +
+            `📁 Files Scanned: ${files.length}\n` +
+            `✅ Files with Core4: ${fileCount}\n` +
+            `📄 CSS File Size: ${fileSize}\n` +
+            `📍 Output Path: ${outputPath}`;
+        vscode.window.showInformationMessage(message, { modal: true });
+    });
     let toggleCommand = vscode.commands.registerCommand('core4.toggleWatching', async () => {
         if (isWatching) {
             fileWatcher.stopWatching();
@@ -95,7 +156,7 @@ function activate(context) {
             console.log('Core4: Configuration changed, cleared caches');
         }
     });
-    context.subscriptions.push(generateCommand, toggleCommand, statusBarItem, configChangeListener);
+    context.subscriptions.push(generateCommand, toggleCommand, openSettingsCommand, openOutputCommand, showStatsCommand, statusBarItem, configChangeListener);
     // Initialize state
     initializeState();
 }
