@@ -174,8 +174,8 @@ export class CSSGenerator {
       return this.generateTextSizeCSS(className);
     }
 
-    // Spacing classes (margin/padding)
-    if (className.startsWith('m-') || className.startsWith('p-')) {
+    // Spacing classes (margin/padding) - must match m-, mx-, my-, ml-, mr-, mt-, mb-, p-, px-, py-, pl-, pr-, pt-, pb-
+    if (className.match(/^[mp][lrtbxy]?-/)) {
       return this.generateSpacingCSS(className);
     }
 
@@ -357,7 +357,11 @@ export class CSSGenerator {
       'rounded': `border-radius: ${borderRadius}`,
       'rounded-sm': 'border-radius: 0.125rem',
       'rounded-lg': 'border-radius: 0.5rem',
-      'rounded-full': 'border-radius: 9999px'
+      'rounded-full': 'border-radius: 9999px',
+      'radius': `border-radius: ${borderRadius}`,
+      'radius-sm': 'border-radius: 4px',
+      'radius-lg': 'border-radius: 0.7em',
+      'radius-xl': 'border-radius: 40px'
     };
 
     if (className in borderMap) {
@@ -431,6 +435,10 @@ export class CSSGenerator {
     switch (className) {
       case 'container':
         return `.${className} { width: 100%; max-width: 1550px; margin: 0 auto; }\n`;
+      case 'container-sm':
+        return `.${className} { width: 100%; max-width: 1395px; margin: 0 auto; }\n`;
+      case 'container-lg':
+        return `.${className} { width: 100%; max-width: 1782.5px; margin: 0 auto; }\n`;
       case 'relative':
         return `.${className} { position: relative; }\n`;
       case 'absolute':
@@ -451,6 +459,31 @@ export class CSSGenerator {
         return `.${className} { border-radius: ${borderRadius}; }\n`;
       case 'shadow':
         return `.${className} { box-shadow: 0 4px 6px ${shadowColor}; }\n`;
+      case 'box-shadow':
+        return `.${className} { box-shadow: 20px 20px 30px rgba(0,0,0,0.3); }\n`;
+      case 'hover-border':
+        return `.${className} { border: 2px solid transparent; transition: border-color 0.3s; }\n.${className}:hover, .${className}:focus { border-color: currentColor; }\n`;
+      case 'setup':
+        return `.${className} > *:nth-child(1) { background: #e3f2fd !important; }\n.${className} > *:nth-child(2) { background: #e8f5e9 !important; }\n.${className} > *:nth-child(3) { background: #fff9c4 !important; }\n.${className} > *:nth-child(4) { background: #ffe0b2 !important; }\n.${className} > *:nth-child(5) { background: #f3e5f5 !important; }\n.${className} > *:nth-child(6) { background: #fce4ec !important; }\n`;
+      case 'slider':
+        return `.${className} { position: relative; overflow: hidden; }\n.${className} > * { display: none; }\n.${className} > *:first-child { display: block; }\n`;
+      case 'slider-dots':
+        return `.${className}.slider { padding-bottom: 2em; }\n`;
+      case 'slider-bar':
+        return `.${className}.slider { padding-bottom: 0.5em; }\n`;
+      case 'zoomee':
+        return `.${className} { display: flex; gap: 0.5em; cursor: pointer; }\n.${className} img { max-width: 100%; height: auto; transition: transform 0.3s; }\n.${className} img:hover { transform: scale(1.05); }\n`;
+      case 'readMore':
+        return `.${className} { position: relative; }\n.${className}.truncated::after { content: '...'; position: absolute; bottom: 0; right: 0; }\n`;
+    }
+
+    // Handle responsive slider disable classes (slider-sm-off, slider-md-off, etc.)
+    const sliderOffMatch = className.match(/slider-(sm|mm|lm|st|mt|lt|sd|md|ld)-off/);
+    if (sliderOffMatch) {
+      const breakpoint = sliderOffMatch[1];
+      if (breakpoint in this.breakpoints) {
+        return `@media (min-width: ${this.breakpoints[breakpoint]}) {\n  .${className} > * { display: block !important; }\n}\n`;
+      }
     }
 
     return '';
@@ -621,29 +654,83 @@ a {
   }
 
   private generateSpacingCSS(className: string): string {
+    // Match patterns:
+    // m-1, p-2 (all sides)
+    // mx-1, my-2, px-3, py-4 (x/y axis)
+    // ml-1, mr-2, mt-3, mb-4, pl-1, pr-2, pt-3, pb-4 (individual sides)
+    // m-sm-2, p-md-3 (responsive)
+    // mx-sm-2, py-md-3 (responsive x/y axis)
+    // ml-sm-1, pt-md-2 (responsive individual sides)
+    
     const parts = className.split('-');
-    const property = parts[0] === 'm' ? 'margin' : 'padding';
-    const size = parts[1];
-
-    if (size in this.spacingValues) {
-      let css = `.${className} { ${property}: ${this.spacingValues[size]} !important; }\n`;
-
-      if (parts.length === 2 && (className.startsWith('mx-') || className.startsWith('my-') || className.startsWith('px-') || className.startsWith('py-'))) {
-        const direction = parts[0].substring(1);
-        const dirProperty = direction === 'x' ? `${property}-left, ${property}-right` : `${property}-top, ${property}-bottom`;
-        css = `.${className} { ${dirProperty}: ${this.spacingValues[size]} !important; }\n`;
-      }
-
-      return css;
+    const baseProperty = parts[0].charAt(0) === 'm' ? 'margin' : 'padding';
+    
+    // Check for directional suffix (l, r, t, b, x, y)
+    const direction = parts[0].length > 1 ? parts[0].substring(1) : '';
+    
+    // Check if responsive (has breakpoint)
+    let breakpoint = '';
+    let sizeIndex = 1;
+    if (parts.length > 2 && parts[1] in this.breakpoints) {
+      breakpoint = parts[1];
+      sizeIndex = 2;
     }
-
-    return '';
+    
+    const size = parts[sizeIndex];
+    
+    if (!(size in this.spacingValues)) {
+      return '';
+    }
+    
+    const value = this.spacingValues[size];
+    let cssRule = '';
+    
+    // Generate the appropriate CSS based on direction
+    if (direction === 'x') {
+      cssRule = `${baseProperty}-left: ${value} !important; ${baseProperty}-right: ${value} !important;`;
+    } else if (direction === 'y') {
+      cssRule = `${baseProperty}-top: ${value} !important; ${baseProperty}-bottom: ${value} !important;`;
+    } else if (direction === 'l') {
+      cssRule = `${baseProperty}-left: ${value} !important;`;
+    } else if (direction === 'r') {
+      cssRule = `${baseProperty}-right: ${value} !important;`;
+    } else if (direction === 't') {
+      cssRule = `${baseProperty}-top: ${value} !important;`;
+    } else if (direction === 'b') {
+      cssRule = `${baseProperty}-bottom: ${value} !important;`;
+    } else {
+      cssRule = `${baseProperty}: ${value} !important;`;
+    }
+    
+    // Wrap in media query if responsive
+    if (breakpoint) {
+      return `@media (min-width: ${this.breakpoints[breakpoint]}) {\n  .${className} { ${cssRule} }\n}\n`;
+    }
+    
+    return `.${className} { ${cssRule} }\n`;
   }
 
   private generateFontSizeCSS(className: string): string {
-    const size = className.replace('fs-', '');
+    // Check if responsive (fs-sm-3xl, fs-md-lg, etc.)
+    const parts = className.replace('fs-', '').split('-');
+    let breakpoint = '';
+    let sizeIndex = 0;
+    
+    if (parts.length > 1 && parts[0] in this.breakpoints) {
+      breakpoint = parts[0];
+      sizeIndex = 1;
+    }
+    
+    const size = parts[sizeIndex];
+    
     if (size in this.fontSizeValues) {
-      return `.${className} { font-size: ${this.fontSizeValues[size]}; }\n`;
+      const cssRule = `font-size: ${this.fontSizeValues[size]};`;
+      
+      if (breakpoint) {
+        return `@media (min-width: ${this.breakpoints[breakpoint]}) {\n  .${className} { ${cssRule} }\n}\n`;
+      }
+      
+      return `.${className} { ${cssRule} }\n`;
     }
     return '';
   }
@@ -693,7 +780,16 @@ a {
 
   private generateGapCSS(className: string): string {
     const parts = className.split('-');
-    const size = parts[1];
+    
+    // Check if responsive (gap-sm-lg, gap-md-xl, etc.)
+    let breakpoint = '';
+    let sizeIndex = 1;
+    if (parts.length > 2 && parts[1] in this.breakpoints) {
+      breakpoint = parts[1];
+      sizeIndex = 2;
+    }
+    
+    const size = parts[sizeIndex];
 
     const gapMultipliers: Record<string, number> = {
       'xs': 0.375,
@@ -707,6 +803,11 @@ a {
 
     if (size in gapMultipliers) {
       const gapValue = `calc((0.7em + 0.3vw) * ${gapMultipliers[size]})`;
+      
+      if (breakpoint) {
+        return `@media (min-width: ${this.breakpoints[breakpoint]}) {\n  .${className} { gap: ${gapValue}; }\n}\n`;
+      }
+      
       return `.${className} { gap: ${gapValue}; }\n`;
     }
 
@@ -714,7 +815,17 @@ a {
   }
 
   private generateAlignmentCSS(className: string): string {
-    const alignment = className.replace('align-', '');
+    // Check if responsive (align-sm-mc, align-md-tr, etc.)
+    const parts = className.split('-');
+    let breakpoint = '';
+    let alignmentIndex = 1;
+    
+    if (parts.length > 2 && parts[1] in this.breakpoints) {
+      breakpoint = parts[1];
+      alignmentIndex = 2;
+    }
+    
+    const alignment = parts[alignmentIndex];
 
     const alignmentMap: Record<string, string> = {
       'tl': 'flex-start left',
@@ -730,7 +841,13 @@ a {
 
     if (alignment in alignmentMap) {
       const [alignContent, textAlign] = alignmentMap[alignment].split(' ');
-      return `.${className} {\n  align-content: ${alignContent};\n  align-items: ${alignContent};\n  text-align: ${textAlign};\n}\n`;
+      const cssRule = `align-content: ${alignContent}; align-items: ${alignContent}; text-align: ${textAlign};`;
+      
+      if (breakpoint) {
+        return `@media (min-width: ${this.breakpoints[breakpoint]}) {\n  .${className} { ${cssRule} }\n}\n`;
+      }
+      
+      return `.${className} { ${cssRule} }\n`;
     }
 
     return '';
