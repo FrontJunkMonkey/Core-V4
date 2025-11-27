@@ -5,6 +5,28 @@ All notable changes to the Core4 VS Code extension will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-11-27
+
+### Added
+- 🎯 **New Display Utilities**: Added support for new d- prefix display classes
+  - `d-off` - display: none
+  - `d-block` - display: block  
+  - `d-inline` - display: inline
+  - `d-inline-block` - display: inline-block
+  - `d-flex` - display: flex
+  - `d-grid` - display: grid
+- 📱 **Responsive Display Utilities**: Full responsive variants for all display utilities
+  - Examples: `d-sm-off`, `d-md-block`, `d-lg-flex`, etc.
+- 🎨 **Layout Pattern Support**: Added support for the new `layout-12-33` grid pattern
+  - Creates a 3-element grid with specific grid areas
+- 🔍 **Enhanced Class Detection**: Updated regex patterns to detect all new display and layout classes
+- ⚡ **Updated Framework Sync**: Extension now matches the latest Core4 framework (Nov 27, 2025)
+
+### Updated
+- Updated CSS generator to handle new display utility patterns
+- Improved class detection for better coverage
+- Enhanced responsive breakpoint handling
+
 ## [0.2.0] - 2024-11-13
 
 ### Added

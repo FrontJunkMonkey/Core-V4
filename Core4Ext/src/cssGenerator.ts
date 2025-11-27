@@ -53,6 +53,16 @@ export class CSSGenerator {
     '3xs': '10px'
   };
 
+  // Display utility values
+  private displayValues: Record<string, string> = {
+    'off': 'none',
+    'block': 'block',
+    'inline': 'inline',
+    'inline-block': 'inline-block',
+    'flex': 'flex',
+    'grid': 'grid'
+  };
+
   private colorValues: Record<string, string> = {
     'primary': '#008001',
     'secondary': '#005500',
@@ -205,6 +215,11 @@ export class CSSGenerator {
       }
     }
 
+    // Display utility classes (d-off, d-block, etc.)
+    if (className.startsWith('d-')) {
+      return this.generateDisplayUtilityCSS(className);
+    }
+
     // Responsive display classes
     if (className.startsWith('show-') || className.startsWith('hide-')) {
       return this.generateResponsiveDisplayCSS(className);
@@ -226,6 +241,11 @@ export class CSSGenerator {
     // Alignment classes
     if (className.startsWith('align-')) {
       return this.generateAlignmentCSS(className);
+    }
+
+    // Special layout patterns
+    if (className === 'layout-12-33') {
+      return this.generateLayout1233CSS();
     }
 
     // Utility classes
@@ -750,6 +770,33 @@ a {
     return '';
   }
 
+  private generateDisplayUtilityCSS(className: string): string {
+    const parts = className.split('-');
+    
+    // Check for responsive display utilities (d-sm-off, d-md-block, etc.)
+    if (parts.length === 3 && parts[1] in this.breakpoints) {
+      const breakpoint = parts[1];
+      const displayType = parts[2];
+      
+      if (displayType in this.displayValues) {
+        const displayValue = this.displayValues[displayType];
+        return `@media (min-width: ${this.breakpoints[breakpoint]}) {\n  .${className} { display: ${displayValue} !important; }\n}\n`;
+      }
+    }
+    
+    // Check for base display utilities (d-off, d-block, etc.)
+    if (parts.length === 2) {
+      const displayType = parts[1];
+      
+      if (displayType in this.displayValues) {
+        const displayValue = this.displayValues[displayType];
+        return `.${className} { display: ${displayValue} !important; }\n`;
+      }
+    }
+    
+    return '';
+  }
+
   private generateResponsiveDisplayCSS(className: string): string {
     const parts = className.split('-');
     const action = parts[0];
@@ -776,6 +823,10 @@ a {
 
   private generateDefaultGapCSS(): string {
     return `.gap { gap: calc(0.7em + 0.3vw); }\n`;
+  }
+
+  private generateLayout1233CSS(): string {
+    return `.layout-12-33 {\n  display: grid;\n  grid-template-areas:\n    "element1 element2"\n    "element3 element3";\n}\n.layout-12-33 > :first-child {\n  grid-area: element1;\n}\n.layout-12-33 > :nth-child(2) {\n  grid-area: element2;\n}\n.layout-12-33 > :nth-child(3) {\n  grid-area: element3;\n}\n`;
   }
 
   private generateGapCSS(className: string): string {

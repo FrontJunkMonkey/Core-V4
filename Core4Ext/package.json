@@ -2,7 +2,7 @@
   "name": "core4-extension",
   "displayName": "Core4 CSS Framework",
   "description": "Automatically generates optimized CSS for the Core4 framework based on classes used in your HTML files",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "FrontJunkMonkey",
   "author": {
     "name": "FrontJunkMonkey"

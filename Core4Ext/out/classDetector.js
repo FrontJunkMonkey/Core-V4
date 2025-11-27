@@ -5,7 +5,7 @@ class ClassDetector {
     constructor() {
         // Single comprehensive regex for ALL Core4 classes
         this.classPattern = new RegExp([
-            // Layout classes (including responsive)
+            // Layout classes (including responsive and special patterns like layout-12-33)
             'layout-(?:[a-z]{2}-)?[a-zA-Z0-9\\-]+',
             // Spacing classes - including directional (ml, mr, mt, mb, pl, pr, pt, pb, px, py, mx, my) and responsive
             // Matches: m-1, mx-2, my-3, ml-4, mr-5, mt-6, mb-7, m-sm-1, mx-md-2, etc.
@@ -17,7 +17,9 @@ class ClassDetector {
             'text-(?:xs|sm|base|lg|xl|2xl|3xl|center|left|right)',
             // Color classes
             '(?:bg-)?(?:primary|secondary|highlight|danger|success|warning|info|black|white|grey-lightest|grey-darkest|trans-grey|trans-black|dark-violet|light-violet)',
-            // Display and positioning
+            // Display utilities (d-off, d-block, d-sm-off, etc.)
+            'd-(?:(?:sm|mm|lm|st|mt|lt|sd|md|ld)-)?(?:off|block|inline|inline-block|flex|grid)',
+            // Display and positioning (legacy show/hide)
             '(?:show|hide)(?:-(?:sm|mm|lm|st|mt|lt|sd|md|ld))?',
             'relative|absolute|fixed',
             'left|center|right',

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core4 Display Utilities Test</title>
+    <link rel="stylesheet" href="./core4.css">
+</head>
+<body>
+    <div class="container p-3">
+        <h1 class="fs-3xl primary">Core4 Display Utilities Test</h1>
+        
+        <!-- Basic display utilities -->
+        <div class="d-block bg-primary white p-2 m-1">This should be displayed (d-block)</div>
+        <div class="d-off bg-secondary white p-2 m-1">This should be hidden (d-off)</div>
+        <div class="d-inline bg-highlight p-2 m-1">Inline element 1</div>
+        <div class="d-inline bg-highlight p-2 m-1">Inline element 2</div>
+        
+        <!-- Responsive display utilities -->
+        <div class="d-off d-md-block bg-success white p-2 m-1">Hidden on small screens, visible on medium+ (d-off d-md-block)</div>
+        <div class="d-block d-lg-off bg-danger white p-2 m-1">Visible on small screens, hidden on large+ (d-block d-lg-off)</div>
+        
+        <!-- Layout pattern test -->
+        <div class="layout-12-33 gap p-3 m-3">
+            <div class="bg-primary white p-2">Element 1 (Top Left)</div>
+            <div class="bg-secondary white p-2">Element 2 (Top Right)</div>
+            <div class="bg-highlight p-2">Element 3 (Bottom Spanning)</div>
+        </div>
+        
+        <!-- Flexbox display -->
+        <div class="d-flex gap bg-grey-lightest p-3">
+            <div class="bg-primary white p-2">Flex Item 1</div>
+            <div class="bg-secondary white p-2">Flex Item 2</div>
+            <div class="bg-highlight p-2">Flex Item 3</div>
+        </div>
+    </div>
+</body>
+</html>
